@@ -1,6 +1,6 @@
 import { Schema } from 'mongoose';
 import { MemberAuthType, MemberStatus, MemberType } from '../libs/member.enum';
-
+//MemberSchema validation object
 const MemberSchema = new Schema({
     MemberType: {
         type: String, 
@@ -107,8 +107,8 @@ const MemberSchema = new Schema({
     },
 },
  {
-  timestamps: true,
-  collection: 'members',
+  timestamps: true,   //➡️ createdAt va updatedAt degan maydonlarni avtomatik hosil qilib beradi
+  collection: 'members',  //➡️ ma’lumotlar members degan joyga saqlansin degani. moongosedan
 },
 );
 

@@ -8,7 +8,32 @@ type Query {
 }
 
 type Mutation {
-  signup: String!
-  login: String!
+  signup(input: MemberInput!): String!
+  login(input: LoginInput!): String!
   updateMember: String!
+}
+
+input MemberInput {
+  memberNick: String!
+  memberPassword: String!
+  memberPhone: String!
+  memberType: MemberType
+  MemberAuthType: MemberAuthType
+}
+
+enum MemberType {
+  USER
+  AGENT
+  ADMIN
+}
+
+enum MemberAuthType {
+  PHONE
+  EMAIL
+  TELEGRAM
+}
+
+input LoginInput {
+  memberNick: String!
+  memberPassword: String!
 }
