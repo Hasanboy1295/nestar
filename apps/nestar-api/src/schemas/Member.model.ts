@@ -2,17 +2,17 @@ import { Schema } from 'mongoose';
 import { MemberAuthType, MemberStatus, MemberType } from '../libs/member.enum';
 //MemberSchema validation object
 const MemberSchema = new Schema({
-    MemberType: {
+    memberType: {
         type: String, 
         enum: MemberType,
         default: MemberType.USER,
     },
-    MemberStatus: { 
+    memberStatus: { 
         type: String, 
         enum: MemberStatus,
         default: MemberStatus.ACTIVE,
     },
-    MemberAuthType: { 
+    memberAuthType: { 
         type: String, 
         enum: MemberAuthType,
         default: MemberAuthType.PHONE,
@@ -73,6 +73,11 @@ const MemberSchema = new Schema({
     },
 
       memberPoints: {
+        type: Number,
+        default: 0,
+    },
+
+       memberLikes: {
         type: Number,
         default: 0,
     },
