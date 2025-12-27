@@ -4,4 +4,11 @@
 
 type Query {
   sayHello: String!
+  getMember: String!
+}
+
+type Mutation {
+  signup: String!
+  login: String!
+  updateMember: String!
 }
