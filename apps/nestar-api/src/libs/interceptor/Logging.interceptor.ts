@@ -35,6 +35,8 @@ export class LoggingInterceptor implements NestInterceptor {
         }),
       );
     }
+    return next.handle();  //bu bolmasa ishlamayabdi negadur 
+
 
   }
 
