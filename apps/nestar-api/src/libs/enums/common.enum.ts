@@ -16,4 +16,5 @@ export enum Message {
  NOT_ALLOWED_REQUEST = "Not allowed request!",
  PROVIDE_ALLOWED_FORMAT = "Please provide jpeg, jpg or  png  images!",
  SELF_SUBSCRIPTION_DEFINED = "Self subscription is defined!",
+ INVALID_PASSWORD = "INVALID_PASSWORD",
 }

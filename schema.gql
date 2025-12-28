@@ -58,7 +58,7 @@ type Query {
 
 type Mutation {
   signup(input: MemberInput!): Member!
-  login(input: LoginInput!): String!
+  login(input: LoginInput!): Member!
   updateMember: String!
 }
 
