@@ -28,3 +28,5 @@ export class AppModule {}
   // imports controllers providers    ==> property
 //ConfigModule GraphQLModule ==> bular package  external package  foprRoot() ==> static method ildiz ot 
 // ComponentsModule DatabaseModule => file package
+
+//NESTJS ning Asosiy INGREDIENTI
