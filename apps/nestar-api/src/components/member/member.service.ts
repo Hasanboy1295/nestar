@@ -11,7 +11,7 @@ import e from 'express';
 @Injectable()
 export class MemberService {
 
-
+ 
     constructor(@InjectModel('Member') private readonly memberModel: Model<Member> ) {}
     public async signup(input: MemberInput): Promise<Member> {
     //TO DO: Hash password 
@@ -32,7 +32,6 @@ export class MemberService {
     .findOne({ memberNick: memberNick })
     .select('+memberPassword')
     .exec();
-
 
         if (!response || response.memberStatus === MemberStatus.DELETE) {
             throw new InternalServerErrorException(Message.NO_MEMBER_NICK);
