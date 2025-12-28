@@ -7,6 +7,8 @@ import { ApolloDriver } from '@nestjs/apollo';
 import { AppResolver } from './app.resolver';
 import { DatabaseModule } from './database/database.module';
 import { ComponentsModule } from './components/components.module';
+import { T } from './libs/types/common';
+import { Message } from './libs/enums/common.enum';
  
 @Module({
 	imports: [
@@ -15,7 +17,16 @@ import { ComponentsModule } from './components/components.module';
     driver: ApolloDriver,
     playground: true,
     uploads: false,
-    autoSchemaFile: 'schema.gql',
+    autoSchemaFile: true,
+    formatError: (error: T) => {
+      const graphQLFormattedError = {
+        code: error?.extensions.code,
+        message: 
+         error?.extensions?.exception?.response?.message ||   error?.extensions?.response?.message || error?.message,
+      };
+      console.log("GRAPHQL GLOBAl ERROR:", graphQLFormattedError);
+      return graphQLFormattedError;
+    }
   }),
   ComponentsModule,  // HHTP qolgan moduleni birlashtradi (koprik) 
   DatabaseModule // TCP loyihamizning asosiy mantigi uchun hizmat qiladigon module imports orqali integratsiyasini qabul qilib olamiz
@@ -29,4 +40,4 @@ export class AppModule {}
 //ConfigModule GraphQLModule ==> bular package  external package  foprRoot() ==> static method ildiz ot 
 // ComponentsModule DatabaseModule => file package
 
-//NESTJS ning Asosiy INGREDIENTI
+//NESTJS ning Asosiy INGREDIENTI 
