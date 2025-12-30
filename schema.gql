@@ -11,7 +11,7 @@ type Member {
   memberNick: String!
   memberFullName: String
   memberImage: String!
-  memberAdress: String
+  memberAddress: String
   memberDesc: String
   memberProperties: Int!
   memberArticles: Int!
@@ -25,6 +25,7 @@ type Member {
   memberWarnings: Int!
   memberBlocks: Int!
   deletedAt: DateTime
+  createdAt: DateTime!
   updatedAt: DateTime!
 }
 
