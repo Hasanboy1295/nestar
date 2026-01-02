@@ -1,12 +1,16 @@
 
+// ZL-TASK:
 
-
-
-
-
-
-
-
+// Shunday function yozing, u parametrda berilgan stringni kebab casega otkazib qaytarsin. Bosh harflarni kichik harflarga ham otkazsin.
+// MASALAN: stringToKebab(“I love Kebab”) return “i-love-kebab”
+function stringToKebab(str) {
+  return str
+    .toLowerCase()          // hammasini kichik harfga o‘tkazamiz
+    .trim()                // bosh va oxiridagi bo‘shliqlarni olib tashlaymiz
+    .replace(/\s+/g, "-"); // bo‘shliqlarni "-" ga almashtiramiz
+}
+// Misol
+console.log(stringToKebab("I love Kebab")); // "i-love-kebab"
 
 
 // TASK ZM:

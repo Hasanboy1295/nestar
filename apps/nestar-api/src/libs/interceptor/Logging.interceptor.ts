@@ -12,14 +12,16 @@ import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
 @Injectable()
-export class LoggingInterceptor implements NestInterceptor {
+export class LoggingInterceptor implements NestInterceptor {//kirib kelayotgan Req typegega qarab.
+   //implements => $=>>  {QOLIP}
+   //extends => classlar orasidagi extendsni izlaydi {CLASS}
   private readonly logger: Logger = new Logger();
 
   public intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const recordTime = Date.now();
     const requestType = context.getType<GqlContextType>();
 
-    if (requestType === 'http') {
+    if (requestType === 'http') {//hali hich nma yozmadik
       //Develop if ypu needed! agar keyin REST log qilmoqchi bo‘lsang
     } else if (requestType === 'graphql') {
       /** (1) Print Request */

@@ -5,7 +5,7 @@ import { LoggingInterceptor } from './libs/interceptor/Logging.interceptor';
 
 async function bootstrap() {//1 bootstrap funksiyasi ishga tushadi
   const app = await NestFactory.create(AppModule);//meth chaqirib  appmoduleni arg ber  app=> obj nestjs+ express qorishmasi 
-   app.useGlobalInterceptors(new LoggingInterceptor());
+   app.useGlobalInterceptors(new LoggingInterceptor());// 
 
 
 
@@ -17,3 +17,5 @@ async function bootstrap() {//1 bootstrap funksiyasi ishga tushadi
 }
 bootstrap();
  
+//pipe 3 xil integratsiya qilsa boladi 
+// 1.method oziga  2.global 3.resolver miqyosida

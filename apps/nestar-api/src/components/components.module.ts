@@ -10,7 +10,7 @@ import { BoardArticleModule } from './board-article/board-article.module';
 
 @Module({
   imports: [
-    MemberModule,
+    MemberModule,//Member MVC
     AuthModule, 
     PropertyModule,
     BoardArticleModule,

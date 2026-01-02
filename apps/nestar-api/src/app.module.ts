@@ -8,13 +8,12 @@ import { AppResolver } from './app.resolver';
 import { DatabaseModule } from './database/database.module';
 import { ComponentsModule } from './components/components.module';
 import { T } from './libs/types/common';
-import { Message } from './libs/enums/common.enum';
  
 @Module({
 	imports: [
     ConfigModule.forRoot(),//environment variable bn ishlaydigon .env
     GraphQLModule.forRoot({//graph ql texnalaogiyasini hosil. qilib berayabdi
-    driver: ApolloDriver,
+    driver: ApolloDriver,//confugratsiyalarini taqdim qildik
     playground: true,
     uploads: false,
     autoSchemaFile: true,
@@ -31,8 +30,8 @@ import { Message } from './libs/enums/common.enum';
   ComponentsModule,  // HHTP qolgan moduleni birlashtradi (koprik) 
   DatabaseModule // TCP loyihamizning asosiy mantigi uchun hizmat qiladigon module imports orqali integratsiyasini qabul qilib olamiz
 ], 
-	controllers: [AppController],
-	providers: [AppService, AppResolver],//ikkisi bolmasa ham bolaverad test uchun tepasidagi ham
+	controllers: [AppController], //rest api 
+	providers: [AppService, AppResolver],// graphql api ikkisi bolmasa ham bolaverad test uchun tepasidagi ham
 })
 export class AppModule {}
  
