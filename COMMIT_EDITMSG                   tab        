@@ -1,0 +1,25 @@
+git cherry-pick --continue
+creation and verbification jwt
+
+# Conflicts:
+#	apps/nestar-api/src/components/auth/auth.service.ts
+#
+# It looks like you may be committing a cherry-pick.
+# If this is not correct, please run
+#	git update-ref -d CHERRY_PICK_HEAD
+# and try again.
+
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# Date:      Sat Jan 3 05:56:47 2026 +0900
+#
+# On branch develop
+# You are currently cherry-picking commit a9d5a09.
+#
+# Changes to be committed:
+#	new file:   apps/nestar-api/src/components/auth/auth.service.ts
+#	modified:   apps/nestar-api/src/components/member/member.service.ts
+#	modified:   apps/nestar-api/src/libs/dto/member/member.ts
+#
