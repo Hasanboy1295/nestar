@@ -7,13 +7,13 @@ import { MemberAuthType, MemberStatus, MemberType } from "../../member.enum";
 @ObjectType()
 export class Member {
     @Field(() => String)
-     _id: ObjectId;
+    _id: ObjectId;
 
     @Field(() => MemberType)
     memberType: MemberType;
 
 
-     @Field(() => MemberStatus)
+    @Field(() => MemberStatus)
     memberStatus: MemberStatus;
 
     @Field(() => MemberAuthType)
@@ -38,40 +38,40 @@ export class Member {
      @Field(() => String, { nullable: true })
     memberAddress?: string;
 
-        @Field(() => String, { nullable: true })
+    @Field(() => String, { nullable: true })
     memberDesc?: string;
 
-      @Field(() =>  Int)
+    @Field(() =>  Int)
     memberProperties: number;
 
     @Field(() =>  Int)
     memberArticles: number;
 
-        @Field(() =>  Int)
+    @Field(() =>  Int)
     memberFollowers: number;
 
-        @Field(() =>  Int)
+    @Field(() =>  Int)
     memberFollowings: number;
 
     @Field(() =>  Int)
     memberPoints: number;
 
-        @Field(() =>  Int)
+    @Field(() =>  Int)
     memberLikes: number;
 
-        @Field(() =>  Int)
+    @Field(() =>  Int)
     memberViews: number;
 
-        @Field(() =>  Int)
+    @Field(() =>  Int)
     memberComments: number;
 
-        @Field(() =>  Int)
+    @Field(() =>  Int)
     memberRank: number;
 
-        @Field(() =>  Int)
+    @Field(() =>  Int)
     memberWarnings: number;
 
-        @Field(() =>  Int)
+    @Field(() =>  Int)
     memberBlocks: number;
 
     @Field(() => Date, { nullable: true })
@@ -80,6 +80,11 @@ export class Member {
     @Field(() => Date)
     createdAt?: Date;
 
-      @Field(() => Date, )
+    @Field(() => Date, )
     updatedAt?: Date;
+
+
+
+    @Field(() => String, { nullable: true })
+    accessToken?: string;
 }

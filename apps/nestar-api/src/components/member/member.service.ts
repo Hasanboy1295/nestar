@@ -18,6 +18,7 @@ export class MemberService {
 
     try {
     const result = await this.memberModel.create(input);
+    result.accessToken = await this.authService.creteToken(result);
     return result;
     } catch (err) {
     console.log('Error, Service.model:', err);
@@ -43,10 +44,10 @@ export class MemberService {
         console.log("response:", response)
         const isMatch = memberPassword === response.memberPassword;
         if (!isMatch)  throw new InternalServerErrorException(Message.WRONG_PASSWORD);
-            return response;
+        response.accessToken = await this.authService.creteToken(response)
+        
+        return response;
     }
-
-
 
     public async updateMember(): Promise<string> {
         return "updateMember 성공!!!";
