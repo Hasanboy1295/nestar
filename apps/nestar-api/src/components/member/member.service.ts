@@ -59,4 +59,13 @@ export class MemberService {
     public async getMember(): Promise<string> {
         return "getMember 성공!!!";
     }
+
+
+    public async getAllMembersByAdmin(): Promise<string> {
+        return "getAllMembersByAdmin 성공!!!";
+    }
+
+    public async updateMemberByAdmin(): Promise<string> {
+        return "updateMemberByAdmin 성공!!!";
+    }
 }
