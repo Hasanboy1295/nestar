@@ -1,11 +1,12 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 import { Member } from '../../libs/dto/member/member';
 import { LoginInput, MemberInput } from '../../libs/dto/member/member.input';
 import { MemberStatus } from '../../libs/member.enum';
 import { Message } from '../../libs/enums/common.enum';
 import { AuthService } from '../auth/auth.service';
+import { MemberUpdate } from '../../libs/dto/member/member.update';
 
 @Injectable()
 export class MemberService {
@@ -19,7 +20,7 @@ export class MemberService {
     //TO DO: Hash password 
     input.memberPassword = await this.authService.hashPassword(input.memberPassword);
 
-    try {
+    try { 
     const result = await this.memberModel.create(input);
     result.accessToken = await this.authService.creteToken(result);
     return result;
@@ -31,7 +32,7 @@ export class MemberService {
     }
 
     public async login(input: LoginInput): Promise<Member> {
-     const { memberNick, memberPassword } = input;
+     const { memberNick, memberPassword } = input;//input distraction
     const response = await this.memberModel
     .findOne({ memberNick: memberNick })
     .select('+memberPassword')
@@ -42,6 +43,9 @@ export class MemberService {
         } else if (response.memberStatus === MemberStatus.BLOCK) {
             throw new InternalServerErrorException(Message.BLOCKED_USER);
         }
+        //Acces tookrn frontendga qaytash sababi
+        //1. Session 2. Tooken 3. TookenHeader
+        //Mobilleda mobileda cookie yoq. 
 
         // TO DO COMPARE PASSWORDS
 
@@ -52,8 +56,21 @@ export class MemberService {
         return response;
     }
 
-    public async updateMember(): Promise<string> {
-        return "updateMember 성공!!!";
+    public async updateMember(memberId: ObjectId, input: MemberUpdate): Promise<Member> {
+        const result: Member = await this.memberModel
+        .findOneAndUpdate(
+            {
+                _id: memberId,
+                memberStatus: MemberStatus.ACTIVE,
+            },
+            input,
+            { new: true },
+        )
+        .exec();
+        if(!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
+
+        result.accessToken = await this.authService.creteToken(result);
+        return result;
     }
 
     public async getMember(): Promise<string> {

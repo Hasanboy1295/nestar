@@ -30,6 +30,7 @@ export class MemberInput {
 }
 
 
+
 @InputType()
 export class LoginInput {
     @IsNotEmpty()

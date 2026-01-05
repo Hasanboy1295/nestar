@@ -33,7 +33,7 @@ import { T } from './libs/types/common';
 	controllers: [AppController], //rest api 
 	providers: [AppService, AppResolver],// graphql api ikkisi bolmasa ham bolaverad test uchun tepasidagi ham
 })
-export class AppModule {}
+export class AppModule {}//MODULE DECORETOR ENGREDIENT
  
   // imports controllers providers    ==> property
 //ConfigModule GraphQLModule ==> bular package  external package  foprRoot() ==> static method ildiz ot 

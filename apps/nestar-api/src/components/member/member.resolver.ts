@@ -10,13 +10,13 @@ import { Roles } from '../auth/decorators/roles.decorator';
 
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { MemberType } from '../../libs/member.enum';
+import { MemberUpdate } from '../../libs/dto/member/member.update';
 
 @Resolver()
 export class MemberResolver {
-    constructor(private readonly memberService:MemberService){}
+    constructor(private readonly memberService:MemberService){}//dependency inject classdan object yasab beradi
 
     @Mutation(()=> Member)
-    
     public async signup(@Args('input') input:MemberInput):Promise<Member>{
         console.log("Mutation: signup");
         return this.memberService.signup(input);
@@ -27,15 +27,6 @@ export class MemberResolver {
         console.log("Mutation: login");
         return this.memberService.login(input);
     }
-     
-    // Authenticated
-    @UseGuards(AuthGuard)
-    @Mutation(()=> String)
-    public async updateMember(@AuthMember('_id') memberId:ObjectId):Promise<string>{
-        console.log("Mutation: updateMember");
-        return this.memberService.updateMember();
-    }
-
 
     @UseGuards(AuthGuard)
     @Query(()=> String)
@@ -46,7 +37,6 @@ export class MemberResolver {
         return `Hi ${memberNick}`;
     }
 
-
     @Roles(MemberType.USER, MemberType.AGENT)
     @UseGuards(
         RolesGuard)
@@ -55,16 +45,27 @@ export class MemberResolver {
         console.log('Query:checkAuthRoles' );
         return `Hi ${authMember.memberNick}, you are ${authMember.memberType} (memberId: ${authMember._id})`;
     }
+     
+    // Authenticated
+    @UseGuards(AuthGuard)
+    @Mutation(()=> Member)
+    public async updateMember(
+        @Args('input') input: MemberUpdate,
+        @AuthMember('_id') memberId: ObjectId,
+        ):Promise<Member>{
+        console.log("Mutation: updateMember");
+        delete input._id;
+        return this.memberService.updateMember(memberId, input);
+    }
 
     @Query(()=> String)
     public async getMember():Promise<string>{
         console.log("Query: getMember");
-        
-        
+
         return this.memberService.getMember();
     }
 
-    //Authorization Admin 
+    //Authorization Admin  huquq bn tekshiradi
     @Roles(MemberType.ADMIN)
     @UseGuards(RolesGuard)
     @Mutation(()=> String)

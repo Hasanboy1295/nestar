@@ -7,10 +7,12 @@ import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: 'Member', schema: MemberSchema }]), AuthModule],
+    MongooseModule.forFeature([{ name: 'Member', schema: MemberSchema }]),
+     AuthModule //koprik member modelga auth modelni chaqir
+    ],
   providers: [
     MemberResolver, 
-    MemberService  //MVC
+    MemberService  //MVC Asosiy mantiq MemberService MemberResolver da 
   ],
 })
 export class MemberModule {
