@@ -1,3 +1,6 @@
+import { registerEnumType } from "@nestjs/graphql";
+import { register } from "module";
+
 export enum Message {
   SOMETHING_WENT_WRONG = "Something went wrong!",
   NO_DATA_FOUND = "Flodata is found!",
@@ -19,3 +22,11 @@ export enum Message {
  SELF_SUBSCRIPTION_DEFINED = "Self subscription is defined!",
  INVALID_PASSWORD = "INVALID_PASSWORD",
 }
+
+export enum Diretion {
+  ASC = 1,
+  DESC = -1, 
+} 
+registerEnumType(Diretion, {
+  name: 'Diretion',
+});
