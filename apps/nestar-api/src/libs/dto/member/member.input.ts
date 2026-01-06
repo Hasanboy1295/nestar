@@ -54,7 +54,7 @@ export class LoginInput {
  }
 
 @InputType()
-export class AgentsInquary {
+export class AgentsInquiry {
     @IsNotEmpty()
     @Min(1)
     @Field(() => Int)
@@ -98,7 +98,7 @@ export class AgentsInquary {
  }
 
 @InputType()
-export class MembersInquary {
+export class MembersInquiry {
     @IsNotEmpty()
     @Min(1)
     @Field(() => Int)
