@@ -1,4 +1,40 @@
 
+// Shunday function yozing, u 2 ta array parametr qabul qilsin.
+// Siz bu ikki arrayning qiymatlari o'xshash bo'lishini 
+// (ya'ni, ularning barcha elementlari bir xil bo'lishini) tekshirishingiz kerak.
+
+// MASALAN:
+// areArraysEqual([1, 2, 3], [3, 1, 2]) // true
+// areArraysEqual([1, 2, 3], [3, 1, 2, 1]) // true
+// areArraysEqual([1, 2, 3], [4, 1, 2]) // false
+
+function areArraysEqual(arr1, arr2) {
+  return arr1.every(item => arr2.includes(item));
+}
+console.log(areArraysEqual([1, 2, 3], [3, 1, 2]));      
+console.log(areArraysEqual([1, 2, 3], [3, 1, 2, 1]));  
+console.log(areArraysEqual([1, 2, 3], [4, 1, 2]));    
+
+
+// TASK ZN:
+
+// Shunday function yozing, uni array va number parametri bo'lsin.
+// Function'ning vazifasi ikkinchi parametr'da berilgan raqam, birinchi
+// array parametr'ning indeksi bo'yicha hisoblanib, shu indeksgacha bo'lgan
+// raqamlarni indeksdan tashqarida bo'lgan raqamlar bilan o'rnini
+// almashtirib qaytarsin.
+
+// MASALAN: rotateArray([1, 2, 3, 4, 5, 6], 3); return [5, 6, 1, 2, 3, 4];
+// function rotateArray(arr, index) {
+//   return [...arr.slice(index), ...arr.slice(0, index)];
+// }
+
+function rotateArray(arr, index) {
+  const i = index % arr.length;
+  return [...arr.slice(i), ...arr.slice(0, i)];
+}
+console.log(rotateArray([1, 2, 3, 4, 5, 6], 3));
+
 // ZL-TASK:
 
 // Shunday function yozing, u parametrda berilgan stringni kebab casega otkazib qaytarsin. Bosh harflarni kichik harflarga ham otkazsin.
@@ -10,7 +46,7 @@ function stringToKebab(str) {
     .replace(/\s+/g, "-"); // bo‘shliqlarni "-" ga almashtiramiz
 }
 // Misol
-console.log(stringToKebab("I love Kebab")); // "i-love-kebab"
+///console.log(stringToKebab("I love Kebab")); // "i-love-kebab"
 
 
 // TASK ZM:
@@ -30,7 +66,7 @@ function reverseInteger(num) {
   );
 }
 
-console.log(reverseInteger(123456789)); 
+//console.log(reverseInteger(123456789)); 
 
 
 // TASK ZK:
@@ -53,6 +89,6 @@ function printNumbers() {
   }, 1000);
 }
 
-printNumbers();
+//printNumbers();
 
 
