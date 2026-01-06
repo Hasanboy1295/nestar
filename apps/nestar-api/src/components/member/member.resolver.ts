@@ -82,7 +82,7 @@ export class MemberResolver {
     @Query(()=> Members)
     public async getAllMemberByAdmin(@Args('input') input: MembersInquiry): Promise<Members>{
         console.log('Query: getAllMemberByAdmin');
-        return await this.memberService.getAllMembersByAdmin(input);
+        return await this.memberService.getAllMemberByAdmin(input);
     }
 
 
