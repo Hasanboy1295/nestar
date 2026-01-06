@@ -89,13 +89,12 @@ export class Member {
     accessToken?: string;
 }
 
-@ObjectType()
+ @ObjectType()
 export class TotalCounter {
       @Field(() => Int, { nullable: true })
       total: number;
 
 }
-
 
 @ObjectType()
 export class Members {
