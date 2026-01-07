@@ -1,4 +1,45 @@
 
+
+// Anagrammalarni Guruhlash
+
+// Sizga stringlar (so'zlar) massivi berilgan. Sizning vazifangiz anagrammalarni birga guruhlashdir.
+
+// Eslatma: Anagramma — bu boshqa so'zning harflarini qayta tartiblash orqali hosil qilingan so'z (masalan, "cinema" va "iceman").
+
+
+// INPUT:
+// const strs = ["eat", "tea", "tan", "ate", "nat", "bat"]; 
+
+// OUTPUT: 
+// result = [
+//   ["eat", "tea", "ate"],
+//   ["tan", "nat"],
+//   ["bat"]
+
+function groupAnagrams(strs: string[]): string[][] {
+  const map: Record<string, string[]> = {};
+
+  for (const word of strs) {
+    // So‘zni saralab kalit hosil qilamiz
+    const key = word.split("").sort().join("");
+
+    if (!map[key]) {
+      map[key] = [];
+    }
+    map[key].push(word);
+  }
+
+  return Object.values(map);
+}
+
+// Misol
+const strs = ["eat", "tea", "tan", "ate", "nat", "bat"];
+console.log(groupAnagrams(strs));
+
+
+
+
+
 // Shunday function yozing, u 2 ta array parametr qabul qilsin.
 // Siz bu ikki arrayning qiymatlari o'xshash bo'lishini 
 // (ya'ni, ularning barcha elementlari bir xil bo'lishini) tekshirishingiz kerak.
