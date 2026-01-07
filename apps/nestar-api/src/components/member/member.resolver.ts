@@ -95,8 +95,9 @@ export class MemberResolver {
         
         return await  this.memberService.updateMemberByAdmin(input);
     }
-    
+
     /** UPLOADER **/
+    /// UPLOADER 
 
 @UseGuards(AuthGuard)
 @Mutation((returns) => String)
