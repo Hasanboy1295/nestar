@@ -8,7 +8,7 @@ import { Diretion, Message } from '../../libs/enums/common.enum';
 import { AuthService } from '../auth/auth.service';
 import { MemberUpdate } from '../../libs/dto/member/member.update';
 import { ViewService } from '../view/view.service';
-import { T } from '../../libs/types/common';
+import { StatisticModifier, T } from '../../libs/types/common';
 import { ViewGroup } from '../../libs/enums/view.enum';
 
 
@@ -165,7 +165,20 @@ if (memberType) match.memberType = memberType;
     public async updateMemberByAdmin(input: MemberUpdate): Promise<Member> {
         const result: Member = await this.memberModel.findOneAndUpdate({_id: input._id}, input,  {new: true}).exec();
         if(!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
-
         return result;
     }
+     public async memberStatsEditor(input: StatisticModifier): Promise<Member> {
+      console.log("executed");
+      const { _id, targetKey, modifier } = input //destraction
+       return await this.memberModel
+       .findOneAndUpdate(
+        _id,//update qilayabdi idni  
+        {
+          $inc: { [targetKey]: modifier } //dynamic key
+        }, 
+        { new: true },
+      )
+    .exec();//Property qoshganda va olinganda ishlatilinadi
+
+     }
 }

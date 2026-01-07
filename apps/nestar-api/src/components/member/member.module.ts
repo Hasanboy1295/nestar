@@ -21,6 +21,7 @@ import { ViewModule } from '../view/view.module';
     MemberResolver, 
     MemberService  //MVC Asosiy mantiq MemberService MemberResolver da 
   ],
+  exports: [MemberService]
 })
 export class MemberModule {
 }
