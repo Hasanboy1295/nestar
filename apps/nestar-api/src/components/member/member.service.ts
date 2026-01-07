@@ -16,11 +16,11 @@ import { ViewGroup } from '../../libs/enums/view.enum';
 export class MemberService {
 
 
-    constructor(@InjectModel('Member') private readonly memberModel: Model<Member>,
+    constructor(
+    @InjectModel('Member') private readonly memberModel: Model<Member>,
      private  authService: AuthService,
      private  viewService: ViewService,
     ) {}
-
     public async signup(input: MemberInput): Promise<Member> {
     //TO DO: Hash password 
     input.memberPassword = await this.authService.hashPassword(input.memberPassword);
