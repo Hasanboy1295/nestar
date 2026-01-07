@@ -134,12 +134,12 @@ public async imagesUploader(
 files: Promise<FileUpload>[],
 @Args('target') target: String,
 ): Promise<string[]> {
-	console.log('Mutation: imagesUploader');
+	console.log('Mutation:      hhhh imagesUploader');
 
 	const uploadedImages = [];
 	const promisedList = files.map(async (img: Promise<FileUpload>, index: number): Promise<Promise<void>> => {
 		try {
-			const { filename, mimetype, encoding, createReadStream } = await img;
+			const { filename, mimetype,  createReadStream } = await img;
 
 			const validMime = validMimeTypes.includes(mimetype);
 			if (!validMime) throw new Error(Message.PROVIDE_ALLOWED_FORMAT);

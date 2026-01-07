@@ -9,6 +9,7 @@ async function bootstrap() {//1 bootstrap funksiyasi ishga tushadi
    app.useGlobalInterceptors(new LoggingInterceptor());// 
  app.useGlobalPipes(new ValidationPipe());
  app.enableCors({origin: true, credentials: true });
+ 
 app.use(graphqlUploadExpress({maxFileSize: 15000000, maxFiles: 10 }));
 app.use('/uploads', express.static('./uploads'))//uploadni static folder sifatida ochib berdik
 
