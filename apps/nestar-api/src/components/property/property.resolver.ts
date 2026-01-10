@@ -16,7 +16,7 @@ import { PropertyUpdate } from '../../libs/dto/property/property.update';
 export class PropertyResolver {
 	constructor(private readonly propertyService: PropertyService) {}
 	//PIPE INTERSEPTOR(REQ) GUARD
-	@Roles(MemberType.AGENT)
+	@Roles(MemberType.AGENT) // AUTHORIZATION
 	@UseGuards(RolesGuard)
 	@Mutation(() => Property) //create property mutation api
 	public async createProperty(

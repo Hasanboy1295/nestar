@@ -21,3 +21,5 @@ export class DatabaseModule {
 		}
 	}
 }
+//DATABASE 2 xil boladi 
+// 1.PRODUCTION -=>  HAQIQIY DATABASEE ASOSI MALUMOTLARNI  2.DEVELOP-=> snovdagi 

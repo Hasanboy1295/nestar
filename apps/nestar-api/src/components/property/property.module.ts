@@ -8,16 +8,17 @@ import PropertySchema from '../../schemas/Property.model';
 import { MemberModule } from '../member/member.module';
 
 @Module({
+	//MODULE DECARATORLARNI ORNATIB OLDIK
 	imports: [
 		MongooseModule.forFeature([
 			{
-				name: 'Property',
-				schema: PropertySchema,
+				name: 'Property', //DATABASEDA property collection bilan  iwlash un 
+				schema: PropertySchema,//SCHEAM modelni hosil qilib berayabdi
 			},
 		]),
 		AuthModule, //koprik member modelga auth modelni chaqir
 		ViewModule,
-		MemberModule,
+		MemberModule,  // IMPORT 2
 	],
 	providers: [PropertyResolver, PropertyService],
 })

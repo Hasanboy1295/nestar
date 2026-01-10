@@ -10,13 +10,13 @@ import { ComponentsModule } from './components/components.module';
 import { T } from './libs/types/common';
  
 @Module({
-	imports: [
+	imports: [//property
     ConfigModule.forRoot(),//environment variable bn ishlaydigon .env
     GraphQLModule.forRoot({//graph ql texnalaogiyasini hosil. qilib berayabdi
     driver: ApolloDriver,//confugratsiyalarini taqdim qildik
-    playground: true,
-    uploads: false,
-    autoSchemaFile: true,
+    playground: true,// documentationni korish un  yoqib qoyilggan 
+    uploads: false,//graphql nikini iahltmymi  ozmz iahltamz 
+    autoSchemaFile: true,// Postmanda schema file auto chiqarib beerayabdi shuning un 
     formatError: (error: T) => {
       const graphQLFormattedError = {
         code: error?.extensions.code,
