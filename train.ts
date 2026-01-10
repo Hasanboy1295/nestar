@@ -1,5 +1,33 @@
-// Anagrammalarni Guruhlash
 
+
+// TASK ZQ:
+
+// Shunday function yozing, bu function berilgan array parametr
+// ichida ikki marotaba yoki undan ko'p takrorlangan sonlarni alohida
+// array'da yagonadan qaytarsin qaytarsin.
+// MASALAN: findDuplicates([1,2,3,4,5,4,3,4]); return [3, 4];
+
+console.log(findDuplicates([1, 2, 3, 4, 5, 4, 3, 4])); 
+function findDuplicates(arr) {
+    const counts = {};
+    const duplicates = [];
+
+    // Har bir son necha marta qatnashganini hisoblaymiz
+    for (const num of arr) {
+        counts[num] = (counts[num] || 0) + 1;
+    }
+
+    // Faqat 1 tadan ko'p qatnashganlarini ajratib olamiz
+    for (const key in counts) {
+        if (counts[key] > 1) {
+            duplicates.push(Number(key));
+        }
+    }
+
+    return duplicates;
+}
+
+// Anagrammalarni Guruhlash
 // Sizga stringlar (so'zlar) massivi berilgan. Sizning vazifangiz anagrammalarni birga guruhlashdir.
 
 // Eslatma: Anagramma — bu boshqa so'zning harflarini qayta tartiblash orqali hosil qilingan so'z (masalan, "cinema" va "iceman").
@@ -29,9 +57,9 @@ function groupAnagrams(strs: string[]): string[][] {
 	return Object.values(map);
 }
 
-// Misol
-const strs = ['eat', 'tea', 'tan', 'ate', 'nat', 'bat'];
-console.log(groupAnagrams(strs));
+
+// const strs = ['eat', 'tea', 'tan', 'ate', 'nat', 'bat'];
+// console.log(groupAnagrams(strs));
 
 // Shunday function yozing, u 2 ta array parametr qabul qilsin.
 // Siz bu ikki arrayning qiymatlari o'xshash bo'lishini

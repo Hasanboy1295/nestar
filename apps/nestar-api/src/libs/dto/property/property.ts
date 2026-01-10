@@ -79,7 +79,7 @@ export class Property {
 
 	//FOR AGREGATION
 
-	@Field(() => Date, { nullable: true })
+	@Field(() => Member, { nullable: true })
 	memberData?: Member;
 }
 
