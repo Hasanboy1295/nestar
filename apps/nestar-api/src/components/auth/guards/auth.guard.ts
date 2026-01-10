@@ -3,8 +3,9 @@ import { AuthService } from '../auth.service';
 import { Message } from 'apps/nestar-api/src/libs/enums/common.enum';
 
 @Injectable()
-export class AuthGuard implements CanActivate {// implements => bu typelarga canactivate bolishi shart deyayabdi
-	constructor(private authService: AuthService) {}//dependency inj orqali authService 
+export class AuthGuard implements CanActivate {
+	// implements => bu typelarga canactivate bolishi shart deyayabdi
+	constructor(private authService: AuthService) {} //dependency inj orqali authService
 
 	async canActivate(context: ExecutionContext | any): Promise<boolean> {
 		console.info('--- @guard() Authentication [AuthGuard] ---');
@@ -12,7 +13,7 @@ export class AuthGuard implements CanActivate {// implements => bu typelarga can
 		if (context.contextType === 'graphql') {
 			const request = context.getArgByIndex(2).req;
 
-			const bearerToken = request.headers.authorization;//headerni ichidan authni olayabdi n
+			const bearerToken = request.headers.authorization; //headerni ichidan authni olayabdi n
 			if (!bearerToken) throw new BadRequestException(Message.TOKEN_NOT_EXIST);
 
 			const token = bearerToken.split(' ')[1],
@@ -20,11 +21,10 @@ export class AuthGuard implements CanActivate {// implements => bu typelarga can
 			if (!authMember) throw new UnauthorizedException(Message.NOT_AUTHENTICATED);
 
 			console.log('memberNick[auth] =>', authMember.memberNick);
-			request.body.authMember = authMember;//requestni boyitib keeyingi jarayonga otqazayabdi
-	
+			request.body.authMember = authMember; //requestni boyitib keeyingi jarayonga otqazayabdi
+
 			return true;
 		}
-	
 
 		// description => http, rpc, gprs and etc are ignored
 	}

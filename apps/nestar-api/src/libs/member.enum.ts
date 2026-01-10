@@ -1,33 +1,32 @@
- import { registerEnumType } from "@nestjs/graphql"; 
+import { registerEnumType } from '@nestjs/graphql';
 
-
- export enum MemberType {
-    USER = 'USER',
-    AGENT = 'AGENT', 
-    ADMIN = 'ADMIN',
+export enum MemberType {
+	USER = 'USER',
+	AGENT = 'AGENT',
+	ADMIN = 'ADMIN',
 }
- registerEnumType(MemberType, {
-    name: 'MemberType',
- })
+registerEnumType(MemberType, {
+	name: 'MemberType',
+});
 
 export enum MemberStatus {
-    ACTIVE = 'ACTIVE',
-    BLOCK = 'BLOCK',
-    DELETE = 'DELETE',
-} 
- registerEnumType(MemberStatus, {
-    name: 'MemberStatus',
- })
+	ACTIVE = 'ACTIVE',
+	BLOCK = 'BLOCK',
+	DELETE = 'DELETE',
+}
+registerEnumType(MemberStatus, {
+	name: 'MemberStatus',
+});
 
 export enum MemberAuthType {
-    PHONE = 'PHONE',
-    EMAIL = 'EMAIL',
-    TELEGRAM = 'TELEGRAM',
+	PHONE = 'PHONE',
+	EMAIL = 'EMAIL',
+	TELEGRAM = 'TELEGRAM',
 }
-    registerEnumType(MemberAuthType, {//.  ➡️ ikkalasini bog‘lab beradi Bu NestJS + GraphQL ga aytadi: 
-    name: 'MemberAuthType',
- })
-
+registerEnumType(MemberAuthType, {
+	//.  ➡️ ikkalasini bog‘lab beradi Bu NestJS + GraphQL ga aytadi:
+	name: 'MemberAuthType',
+});
 
 //  “Mana bu TypeScript enum ni
 // GraphQL’da ham ishlatmoqchiman”
@@ -35,7 +34,6 @@ export enum MemberAuthType {
 
 // TypeScript enum ni GraphQL o‘zi bilmaydi ❌
 // Shuning uchun ro‘yxatdan o‘tkazish (register) qilish kerak.
-
 
 // 👉 GraphQL ga aytyapti:
 

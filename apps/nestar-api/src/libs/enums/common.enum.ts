@@ -23,10 +23,10 @@ export enum Message {
  INVALID_PASSWORD = "INVALID_PASSWORD",
 }
 
-export enum Diretion {
+export enum Direction {
   ASC = 1,
   DESC = -1, 
 } 
-registerEnumType(Diretion, {
+registerEnumType(Direction, {
   name: 'Diretion',
 });

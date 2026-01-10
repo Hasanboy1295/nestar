@@ -7,32 +7,20 @@ import { AuthModule } from '../auth/auth.module';
 import { ViewModule } from '../view/view.module';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([
-      { 
-      name: 'Member', 
-      schema: MemberSchema,
-     }
-    ]),
-     AuthModule, //koprik member modelga auth modelni chaqir
-     ViewModule,
-    ],
-  providers: [
-    MemberResolver, 
-    MemberService  //MVC Asosiy mantiq MemberService MemberResolver da 
-  ],
-  exports: [MemberService]
+	imports: [
+		MongooseModule.forFeature([
+			{
+				name: 'Member',
+				schema: MemberSchema,
+			},
+		]),
+		AuthModule, //koprik member modelga auth modelni chaqir
+		ViewModule, // IMPORT 2
+	],
+	providers: [
+		MemberResolver,
+		MemberService, //MVC Asosiy mantiq MemberService MemberResolver da
+	],
+	exports: [MemberService],
 })
-export class MemberModule {
-}
- 
-
-
-
-
-
-
-
-
-
-
+export class MemberModule {}

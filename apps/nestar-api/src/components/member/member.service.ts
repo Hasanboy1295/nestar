@@ -4,181 +4,166 @@ import { Model, ObjectId } from 'mongoose';
 import { Member, Members } from '../../libs/dto/member/member';
 import { AgentsInquiry, LoginInput, MemberInput, MembersInquiry } from '../../libs/dto/member/member.input';
 import { MemberStatus, MemberType } from '../../libs/member.enum';
-import { Diretion, Message } from '../../libs/enums/common.enum';
+import {  Direction, Message } from '../../libs/enums/common.enum';
 import { AuthService } from '../auth/auth.service';
 import { MemberUpdate } from '../../libs/dto/member/member.update';
 import { ViewService } from '../view/view.service';
 import { StatisticModifier, T } from '../../libs/types/common';
 import { ViewGroup } from '../../libs/enums/view.enum';
 
-
 @Injectable()
 export class MemberService {
+	constructor(
+		@InjectModel('Member') private readonly memberModel: Model<Member>,
+		private authService: AuthService,
+		private viewService: ViewService,// //Injection 3  private → faqat shu class ichida ishlatil
+	) {}
+	public async signup(input: MemberInput): Promise<Member> {
+		//TO DO: Hash password
+		input.memberPassword = await this.authService.hashPassword(input.memberPassword);
 
+		try {
+			const result = await this.memberModel.create(input);
+			result.accessToken = await this.authService.creteToken(result);
+			return result;
+		} catch (err) {
+			console.log('Error, Service.model:', err.message);
+			throw new BadRequestException(Message.USED_MEMBER_NICK_OR_PHONE);
+		}
+	}
 
-    constructor(
-    @InjectModel('Member') private readonly memberModel: Model<Member>,
-     private  authService: AuthService,
-     private  viewService: ViewService,
-    ) {}
-    public async signup(input: MemberInput): Promise<Member> {
-    //TO DO: Hash password 
-    input.memberPassword = await this.authService.hashPassword(input.memberPassword);
+	public async login(input: LoginInput): Promise<Member> {
+		const { memberNick, memberPassword } = input; //input distraction
+		const response = await this.memberModel.findOne({ memberNick: memberNick }).select('+memberPassword').exec();
 
-    try { 
-    const result = await this.memberModel.create(input);
-    result.accessToken = await this.authService.creteToken(result);
-    return result;
-    } catch (err) {
-    console.log('Error, Service.model:', err.message);
-    throw new BadRequestException(Message.USED_MEMBER_NICK_OR_PHONE);
-    }
-  
-    }
+		if (!response || response.memberStatus === MemberStatus.DELETE) {
+			throw new InternalServerErrorException(Message.NO_MEMBER_NICK);
+		} else if (response.memberStatus === MemberStatus.BLOCK) {
+			throw new InternalServerErrorException(Message.BLOCKED_USER);
+		}
+		//Acces tookrn frontendga qaytash sababi
+		//1. Session 2. Tooken 3. TookenHeader
+		//Mobilleda mobileda cookie yoq.
 
-    public async login(input: LoginInput): Promise<Member> {
-     const { memberNick, memberPassword } = input;//input distraction
-    const response = await this.memberModel
-    .findOne({ memberNick: memberNick })
-    .select('+memberPassword')
-    .exec();
+		// TO DO COMPARE PASSWORDS
 
-        if (!response || response.memberStatus === MemberStatus.DELETE) {
-            throw new InternalServerErrorException(Message.NO_MEMBER_NICK);
-        } else if (response.memberStatus === MemberStatus.BLOCK) {
-            throw new InternalServerErrorException(Message.BLOCKED_USER);
-        }
-        //Acces tookrn frontendga qaytash sababi
-        //1. Session 2. Tooken 3. TookenHeader
-        //Mobilleda mobileda cookie yoq. 
+		const isMatch = await this.authService.comparePasswords(input.memberPassword, response.memberPassword);
+		if (!isMatch) throw new InternalServerErrorException(Message.WRONG_PASSWORD);
+		response.accessToken = await this.authService.creteToken(response);
 
-        // TO DO COMPARE PASSWORDS
+		return response;
+	}
 
-        const isMatch =  await this.authService.comparePasswords(input.memberPassword, response.memberPassword);
-        if (!isMatch)  throw new InternalServerErrorException(Message.WRONG_PASSWORD);
-        response.accessToken = await this.authService.creteToken(response)
-        
-        return response;
-    }
+	public async updateMember(memberId: ObjectId, input: MemberUpdate): Promise<Member> {//MemberUpdate — bu DTO / interface
+		const result: Member = await this.memberModel
+			.findOneAndUpdate(//Mongoose method. findOneAndUpdate(filter, input)=> MongoDB buni avtomatik $set deb oladi.
+				{
+					_id: memberId,
+					memberStatus: MemberStatus.ACTIVE,
+				},
+				input,// nima o‘zgarsin  input = { nickname, avatar }
+				{ new: true },
+			)    /** ObjectId → MongoDB ID tipi input → ,update qilinadigan data (object) ,findOneAndUpdate → 3 ta argument oladi , input → method emas ❌,  { new: true } → yangilangan document qaytaradi**/
+			.exec();
+		if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
 
-    public async updateMember(memberId: ObjectId, input: MemberUpdate): Promise<Member> {
-        const result: Member = await this.memberModel
-        .findOneAndUpdate(
-            {
-                _id: memberId,
-                memberStatus: MemberStatus.ACTIVE,
-            },
-            input,
-            { new: true },
-        )
-        .exec();
-        if(!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
+		result.accessToken = await this.authService.creteToken(result);
+		return result;
+	}
 
-        result.accessToken = await this.authService.creteToken(result);
-        return result;
-    }
+	public async getMember(memberId: ObjectId, targetId: ObjectId): Promise<Member> {
+		const search: T = {
+			_id: targetId,
+			memberStatus: {
+				$in: [MemberStatus.ACTIVE, MemberStatus.BLOCK],
+			},
+		};
+		const targetMember = await this.memberModel.findOne(search).lean().exec();
+		if (!targetMember) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
-    public async getMember(memberId: ObjectId, targetId: ObjectId): Promise<Member> {
-        const search: T = {
-            _id: targetId,
-            memberStatus: {
-                $in: [MemberStatus.ACTIVE, MemberStatus.BLOCK],
-            },
-        };
-        const targetMember = await this.memberModel.findOne(search).lean().exec();
-        if (!targetMember) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
-       
+		if (memberId) {
+			//record view
+			const viewInput = { memberId: memberId, viewRefId: targetId, viewGroup: ViewGroup.MEMBER };
+			const newView = await this.viewService.recordView(viewInput);
+			if (newView) {
+				//increase memberview
+				await this.memberModel.findOneAndUpdate(search, { $inc: { memberViews: 1 } }, { new: true }).exec(); //🔹 $inc — raqamni oshirish / kamaytirish
+				targetMember.memberViews++;
+			}
 
-         if(memberId) {
-              //record view
-              const viewInput = { memberId: memberId, viewRefId: targetId, viewGroup: ViewGroup.MEMBER};
-            const newView = await this.viewService.recordView(viewInput);
-            if (newView)  {
-             //increase memberview
-                await this.memberModel.findOneAndUpdate(search, { $inc: { memberViews: 1 } }, { new: true }).exec();
-                targetMember.memberViews++;
-            }
+			//meLiked
+			//meFollowed
+		}
+		return targetMember;
+	}
 
-            //meLiked
-            //meFollowed
-         }
-         return targetMember;
-    }
+	public async getAgents(memberId: ObjectId, input: AgentsInquiry): Promise<Members> {
+		const { text } = input.search;
+		const match: T = { memberType: MemberType.AGENT, memberStatus: MemberStatus.ACTIVE };
+		const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
 
-   
-    public async getAgents(memberId: ObjectId, input: AgentsInquiry): Promise<Members> {
-        const { text } = input.search;
-        const match: T = { memberType: MemberType.AGENT, memberStatus: MemberStatus.ACTIVE };
-        const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Diretion.DESC };
+		if (text) match.memberNick = { $regex: new RegExp(text, 'i') };
+		console.log('match:', match);
 
-        if(text) match.memberNick = { $regex: new RegExp(text, 'i') };
-        console.log('match:', match);
+		const result = await this.memberModel
+			.aggregate([
+				{ $match: match },
+				{ $sort: sort },
+				{
+					$facet: {
+						list: [{ $skip: (input.page - 1) * input.limit }, { $limit: input.limit }],
+						metaCounter: [{ $count: 'total' }],
+					}, //Bit nechhta pipelinelrni chaqrish un
+				},
+			])
+			.exec();
+		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
-        const result = await this.memberModel
-        .aggregate([
-            { $match: match },
-            { $sort: sort },
-            {
-                $facet: {
-                    list: [{ $skip: (input.page -1) * input.limit }, { $limit: input.limit }],
-                    metaCounter: [{ $count: 'total' }],
+		return result[0];
+	}
 
-                },//Bit nechhta pipelinelrni chaqrish un 
-            },
-        ])
-        .exec();
-        if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+	public async getAllMembersByAdmin(input: MembersInquiry): Promise<Members> {
+		const { memberStatus, memberType, text } = input.search;
+		const match: T = {};
+		const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
+		if (memberStatus) match.memberStatus = memberStatus;
+		if (memberType) match.memberType = memberType;
 
-        return result[0];
-    }
+		if (text) match.memberNick = { $regex: new RegExp(text, 'i') };
+		console.log('match:', match);
 
+		const result = await this.memberModel
+			.aggregate([
+				{ $match: match },
+				{ $sort: sort },
+				{
+					$facet: {
+						list: [{ $skip: (input.page - 1) * input.limit }, { $limit: input.limit }],
+						metaCounter: [{ $count: 'total' }],
+					}, //Bit nechhta pipelinelrni chaqrish un
+				},
+			])
+			.exec();
+		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
-    public async getAllMembersByAdmin(input: MembersInquiry): Promise<Members> {
-               const {memberStatus, memberType, text } = input.search;
-        const match: T = {};
-        const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Diretion.DESC };
-   if (memberStatus) match.memberStatus = memberStatus;
-if (memberType) match.memberType = memberType;
+		return result[0];
+	}
 
-
-        if(text) match.memberNick = { $regex: new RegExp(text, 'i') };
-        console.log('match:', match);
-
-        const result = await this.memberModel
-        .aggregate([
-            { $match: match },
-            { $sort: sort },
-            {
-                $facet: {
-                    list: [{ $skip: (input.page -1) * input.limit }, { $limit: input.limit }],
-                    metaCounter: [{ $count: 'total' }],
-
-                },//Bit nechhta pipelinelrni chaqrish un 
-            },
-        ])
-        .exec();
-        if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
-
-        return result[0];
-    }
-
-    public async updateMemberByAdmin(input: MemberUpdate): Promise<Member> {
-        const result: Member = await this.memberModel.findOneAndUpdate({_id: input._id}, input,  {new: true}).exec();
-        if(!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
-        return result;
-    }
-     public async memberStatsEditor(input: StatisticModifier): Promise<Member> {
-      console.log("executed");
-      const { _id, targetKey, modifier } = input //destraction
-       return await this.memberModel
-       .findOneAndUpdate(
-        _id,//update qilayabdi idni  
-        {
-          $inc: { [targetKey]: modifier } //dynamic key
-        }, 
-        { new: true },
-      )
-    .exec();//Property qoshganda va olinganda ishlatilinadi
-
-     }
+	public async updateMemberByAdmin(input: MemberUpdate): Promise<Member> {
+		const result: Member = await this.memberModel.findOneAndUpdate({ _id: input._id }, input, { new: true }).exec();
+		if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
+		return result;
+	}
+	public async memberStatsEditor(input: StatisticModifier): Promise<Member> {
+		const { _id, targetKey, modifier } = input; //destraction
+		return await this.memberModel
+			.findOneAndUpdate(
+				_id, //update qilayabdi idni
+				{
+					$inc: { [targetKey]: modifier }, //dynamic key 🔹 $inc — raqamni oshirish / kamaytirish
+				},
+				{ new: true },
+			)
+			.exec(); //Property qoshganda va olinganda ishlatilinadi
+	}
 }
