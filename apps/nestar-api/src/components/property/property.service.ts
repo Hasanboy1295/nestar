@@ -15,7 +15,6 @@ import * as moment from 'moment';
 
 @Injectable()
 export class PropertyService {
-	
 	constructor(
 		@InjectModel('Property')private readonly propertyModel: Model<Property>,
 		private memberService: MemberService, //
@@ -85,51 +84,82 @@ export class PropertyService {
 			.exec();
 	}
 
+// public async updateProperty(memberId: ObjectId, input: PropertyUpdate): Promise<Property> {
+
+//   const current = await this.propertyModel.findOne({
+//     _id: input._id,
+//     memberId: memberId,
+//   });
+
+//   if (!current) {
+//     throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+//   }
+
+//   // ❗ faqat ACTIVE bo‘lgan property update qilinadi
+//   if (current.propertyStatus !== PropertyStatus.ACTIVE) {
+//     throw new BadRequestException(Message.NOT_ALLOWED_REQUEST);
+//   }
+
+//   // status bo‘yicha vaqtlarni yozamiz
+//   if (input.propertyStatus === PropertyStatus.SOLD) {
+//     input.soldAt = moment().toDate();
+//   }
+
+//   if (input.propertyStatus === PropertyStatus.DELETE) {
+//     input.deletedAt = moment().toDate();
+//   }
+
+//   const result = await this.propertyModel
+//     .findOneAndUpdate(
+//       { _id: input._id, memberId },
+//       input,
+//       { new: true },
+//     )
+//     .exec();
+
+//   if (!result) {
+//     throw new InternalServerErrorException(Message.UPDATE_FAILED);
+//   }
+
+//   // statni kamaytirish
+//   if (
+//     input.propertyStatus === PropertyStatus.SOLD ||
+//     input.propertyStatus === PropertyStatus.DELETE
+//   ) {
+//     await this.memberService.memberStatsEditor({
+//       _id: memberId,
+//       targetKey: 'memberProperties',
+//       modifier: -1,
+//     });
+//   }
+
+//   return result;
+// }
 public async updateProperty(
   memberId: ObjectId,
-  input: PropertyUpdate,
+  input: PropertyUpdate
 ): Promise<Property> {
+  let { propertyStatus, soldAt, deletedAt } = input;
 
-  const current = await this.propertyModel.findOne({
+  const search: T = {
     _id: input._id,
     memberId: memberId,
-  });
+    propertyStatus: PropertyStatus.ACTIVE,
+  };
 
-  if (!current) {
-    throw new InternalServerErrorException(Message.NO_DATA_FOUND);
-  }
-
-  // ❗ faqat ACTIVE bo‘lgan property update qilinadi
-  if (current.propertyStatus !== PropertyStatus.ACTIVE) {
-    throw new BadRequestException(Message.NOT_ALLOWED_REQUEST);
-  }
-
-  // status bo‘yicha vaqtlarni yozamiz
-  if (input.propertyStatus === PropertyStatus.SOLD) {
-    input.soldAt = moment().toDate();
-  }
-
-  if (input.propertyStatus === PropertyStatus.DELETE) {
-    input.deletedAt = moment().toDate();
-  }
+  if (propertyStatus === PropertyStatus.SOLD) soldAt = moment().toDate();
+  else if (propertyStatus === PropertyStatus.DELETE) deletedAt = moment().toDate();
 
   const result = await this.propertyModel
-    .findOneAndUpdate(
-      { _id: input._id, memberId },
-      input,
-      { new: true },
-    )
+    .findOneAndUpdate(search, input, {
+      new: true,
+    })
     .exec();
 
-  if (!result) {
+  if (!result)
     throw new InternalServerErrorException(Message.UPDATE_FAILED);
-  }
 
-  // statni kamaytirish
-  if (
-    input.propertyStatus === PropertyStatus.SOLD ||
-    input.propertyStatus === PropertyStatus.DELETE
-  ) {
+  if (soldAt || deletedAt) {
     await this.memberService.memberStatsEditor({
       _id: memberId,
       targetKey: 'memberProperties',
@@ -139,6 +169,8 @@ public async updateProperty(
 
   return result;
 }
+
+
 
 public async getProperties(memberId: ObjectId, input: PropertiesInquiry): Promise<Properties> {
   const match: T = { propertyStatus: PropertyStatus.ACTIVE };
@@ -280,4 +312,34 @@ public async getAllPropertiesByAdmin( input: AllPropertiesInquiry ): Promise<Pro
 }
 
 
+public async updatePropertyByAdmin(input: PropertyUpdate): Promise<Property> {
+  let { propertyStatus, soldAt, deletedAt } = input;
+  const search: T = {
+    _id: input._id,
+    propertyStatus: PropertyStatus.ACTIVE,
+  };
+
+  if (propertyStatus === PropertyStatus.SOLD) soldAt = moment().toDate();
+  else if (propertyStatus === PropertyStatus.DELETE) deletedAt = moment().toDate();
+
+  const result = await this.propertyModel
+    .findOneAndUpdate(search, input, {
+      new: true,
+    })
+    .exec();
+
+  if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
+
+  if (soldAt || deletedAt) {
+    await this.memberService.memberStatsEditor({
+      _id: result.memberId,
+      targetKey: 'memberProperties',
+      modifier: -1,
+    });
+  }
+
+  return result;
 }
+
+}
+
