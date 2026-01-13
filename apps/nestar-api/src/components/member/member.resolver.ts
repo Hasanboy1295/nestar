@@ -75,6 +75,8 @@ export class MemberResolver {
 		return await this.memberService.getAgents(memberId, input);
 	}
 
+      
+	// ADMIN 
 	//Authorization Admin  huquq bn tekshiradi ADMIN
 	@Roles(MemberType.ADMIN)
 	@UseGuards(RolesGuard)

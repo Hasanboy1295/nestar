@@ -110,7 +110,7 @@ export class MemberService {
 				{ $match: match },
 				{ $sort: sort },
 				{
-					$facet: {
+					$facet: { //pipi =>pipe 
 						list: [{ $skip: (input.page - 1) * input.limit }, { $limit: input.limit }],
 						metaCounter: [{ $count: 'total' }],
 					}, //Bit nechhta pipelinelrni chaqrish un
@@ -167,3 +167,5 @@ export class MemberService {
 			.exec(); //Property qoshganda va olinganda ishlatilinadi
 	}
 }
+
+

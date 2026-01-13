@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, InternalServerErrorException } from '@
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId, Schema } from 'mongoose';
 import { Properties, Property } from '../../libs/dto/property/property';
-import { AgentPropertiesInquiry, PropertiesInquiry, PropertyInput } from '../../libs/dto/property/property.input';
+import { AgentPropertiesInquiry, AllPropertiesInquiry, PropertiesInquiry, PropertyInput } from '../../libs/dto/property/property.input';
 import {  Direction, Message } from '../../libs/enums/common.enum';
 import { MemberService } from '../member/member.service';
 import { ViewGroup } from '../../libs/enums/view.enum';
@@ -10,8 +10,8 @@ import { StatisticModifier, T } from '../../libs/types/common';
 import { PropertyStatus } from '../../libs/enums/property.enum';
 import { ViewService } from '../view/view.service';
 import { PropertyUpdate } from '../../libs/dto/property/property.update';
-import moment from 'moment';
 import { lookupMember, shapeIntoMongoObjectId } from '../../libs/config';
+import * as moment from 'moment'; 
 
 @Injectable()
 export class PropertyService {
@@ -85,29 +85,52 @@ export class PropertyService {
 			.exec();
 	}
 
-	 public async updateProperty(memberId: ObjectId, input: PropertyUpdate): Promise<Property> {
-  let { propertyStatus, soldAt, deletedAt } = input;
-  const search: T = {
+public async updateProperty(
+  memberId: ObjectId,
+  input: PropertyUpdate,
+): Promise<Property> {
+
+  const current = await this.propertyModel.findOne({
     _id: input._id,
     memberId: memberId,
-    propertyStatus: PropertyStatus.ACTIVE,
-  };
+  });
 
-  if (propertyStatus === PropertyStatus.SOLD) soldAt = moment().toDate();
-   else if (propertyStatus === PropertyStatus.DELETE) deletedAt = moment().toDate();
-  
+  if (!current) {
+    throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+  }
+
+  // ❗ faqat ACTIVE bo‘lgan property update qilinadi
+  if (current.propertyStatus !== PropertyStatus.ACTIVE) {
+    throw new BadRequestException(Message.NOT_ALLOWED_REQUEST);
+  }
+
+  // status bo‘yicha vaqtlarni yozamiz
+  if (input.propertyStatus === PropertyStatus.SOLD) {
+    input.soldAt = moment().toDate();
+  }
+
+  if (input.propertyStatus === PropertyStatus.DELETE) {
+    input.deletedAt = moment().toDate();
+  }
+
   const result = await this.propertyModel
-    .findOneAndUpdate(search, input, {
-      new: true,
-    })
+    .findOneAndUpdate(
+      { _id: input._id, memberId },
+      input,
+      { new: true },
+    )
     .exec();
 
   if (!result) {
     throw new InternalServerErrorException(Message.UPDATE_FAILED);
   }
 
-  if (soldAt || deletedAt) {
-    await this.memberService.memberStatsEditor({//memberservicedagini chaqirayabmiz
+  // statni kamaytirish
+  if (
+    input.propertyStatus === PropertyStatus.SOLD ||
+    input.propertyStatus === PropertyStatus.DELETE
+  ) {
+    await this.memberService.memberStatsEditor({
       _id: memberId,
       targetKey: 'memberProperties',
       modifier: -1,
@@ -181,23 +204,16 @@ private shapeMatchQuery(match: T, input: PropertiesInquiry): void {
 }
 
 
-public async getAgentProperties(
-  memberId: ObjectId,
-  input: AgentPropertiesInquiry,
-): Promise<Properties> { 
-
+public async getAgentProperties(memberId: ObjectId, input: AgentPropertiesInquiry ): Promise<Properties> { 
   const { propertyStatus } = input.search;
-  if (propertyStatus === PropertyStatus.DELETE)
-    throw new BadRequestException(Message.NOT_ALLOWED_REQUEST);
+  if (propertyStatus === PropertyStatus.DELETE) throw new BadRequestException(Message.NOT_ALLOWED_REQUEST);
 
-  const match: T = {
-    memberId: memberId,
-    propertyStatus: propertyStatus ?? { $ne: PropertyStatus.ACTIVE},
-  };
+const match: T = {
+  memberId: shapeIntoMongoObjectId(memberId),
+  propertyStatus: propertyStatus ?? { $ne: PropertyStatus.DELETE },
+};
 
-  const sort: T = {
-    [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC,
-  };
+  const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
 
   const result = await this.propertyModel
     .aggregate([
@@ -217,10 +233,51 @@ public async getAgentProperties(
     ])
     .exec();
 
+  if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+  return result[0];
+}
+
+public async getAllPropertiesByAdmin( input: AllPropertiesInquiry ): Promise<Properties> {
+  const { propertyStatus, propertyLocationList } = input.search;
+
+  const match: any = {};
+  const sort: any = {
+    [input?.sort ?? 'createdAt']:
+      input?.direction ?? Direction.DESC,
+  };
+
+  if (propertyStatus) match.propertyStatus = propertyStatus;
+  if (propertyLocationList) match.propertyLocation = { $in: propertyLocationList };
+
+  const result = await this.propertyModel
+    .aggregate([
+      { $match: match },
+      { $sort: sort },
+      {
+        $facet: {
+          list: [
+            { $skip: (input.page - 1) * input.limit },
+            { $limit: input.limit },
+            {
+              $lookup: {
+                from: 'members',
+                localField: 'memberId',
+                foreignField: '_id',
+                as: 'memberData',
+              },
+            },
+          ],
+          metaCounter: [{ $count: 'total' }],
+        },
+      },
+    ])
+    .exec();
+
   if (!result.length)
     throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
   return result[0];
 }
+
 
 }

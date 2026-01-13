@@ -1,7 +1,7 @@
 import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
 import { PropertyService } from './property.service';
 import { Properties, Property } from '../../libs/dto/property/property';
-import { AgentPropertiesInquiry, PropertiesInquiry, PropertyInput } from '../../libs/dto/property/property.input';
+import { AgentPropertiesInquiry, AllPropertiesInquiry, PropertiesInquiry, PropertyInput } from '../../libs/dto/property/property.input';
 import { MemberType } from '../../libs/member.enum';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UseGuards } from '@nestjs/common';
@@ -25,7 +25,7 @@ export class PropertyResolver {
 		@AuthMember('_id') memberId: ObjectId, // memberId
 	): Promise<Property> {
 		console.log('Mutation: createProperty');
-		input.memberId = memberId; //boytayabmiz memberID  ni frontenddan yubormayabmiz xafsizlik uchun  AGGREGENTGA BOGLIK ISHLAR qilmaslik uchun
+		input.memberId = memberId; // ACCES TOOKEN ORQALI boytayabmiz memberID  ni frontenddan yubormayabmiz xafsizlik uchun  AGGREGENTGA BOGLIK ISHLAR qilmaslik uchun
 		return await this.propertyService.createProperty(input); //tepadagi
 	}
 	// INTERSEPTOR (Res)
@@ -74,6 +74,29 @@ public async getAgentProperties(
   console.log('Query: getAgentProperties');
   return await this.propertyService.getAgentProperties(memberId, input);
 }
+
+
+@Roles(MemberType.ADMIN)
+@UseGuards(RolesGuard)
+@Query(() => Properties)
+public async getAllPropertiesByAdmin(
+  @Args('input') input: AllPropertiesInquiry,
+  @AuthMember('_id') memberId: ObjectId,
+): Promise<Properties> {
+  console.log('Query: getAllPropertiesByAdmin');
+  return await this.propertyService.getAllPropertiesByAdmin(input);
+}
+
+
+
+
+
+
+
+
+
+
+
 
 	}
 
