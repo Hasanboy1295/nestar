@@ -3,22 +3,20 @@ import { MemberModule } from './member/member.module';
 import { PropertyModule } from './property/property.module';
 import { AuthModule } from './auth/auth.module';
 import { CommentModule } from './comment/comment.module';
-import { LikesModule } from './likes/likes.module';
 import { FollowModule } from './follow/follow.module';
 import { BoardArticleModule } from './board-article/board-article.module';
 import { ViewModule } from './view/view.module';
 
 @Module({
 	imports: [
-		MemberModule, //Member MVC
+		MemberModule,
 		AuthModule,
 		PropertyModule,
 		BoardArticleModule,
 		CommentModule,
-		LikesModule,
-		ViewModule,
-		FollowModule,
-	],
 	
+		FollowModule,
+		ViewModule,
+	],
 })
 export class ComponentsModule {}

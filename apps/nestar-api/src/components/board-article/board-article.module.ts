@@ -19,7 +19,7 @@ import { BoardArticleService } from './board-article.service';
         ]),
         AuthModule,
         MemberModule,
-        ViewModule
+        ViewModule,
     ],
     providers: [BoardArticleResolver, BoardArticleService],
     exports: [BoardArticleService],
