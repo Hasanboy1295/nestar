@@ -4,7 +4,7 @@ import { Model, ObjectId  } from 'mongoose';
 import { BoardArticle, BoardArticles } from '../../libs/dto/board-article/board-article';
 import { MemberService } from '../member/member.service';
 import { ViewService } from '../view/view.service';
-import { BoardArticleInput, BoardArticlesInquiry  } from '../../libs/dto/board-article/board-article.input';
+import { AllBoardArticlesInquiry, BoardArticleInput, BoardArticlesInquiry  } from '../../libs/dto/board-article/board-article.input';
 import {  Direction, Message } from '../../libs/enums/common.enum';
 import { StatisticModifier, T } from '../../libs/types/common';
 import { BoardArticleStatus } from '../../libs/enums/board-article.enum';
@@ -150,4 +150,70 @@ public async boardArticleStatsEditor(input: StatisticModifier): Promise<BoardArt
 			)
 			.exec();
 	}
+
+//========================= Admin Section ========================//
+
+
+	public async getAllBoardArticlesByAdmin(input: AllBoardArticlesInquiry): Promise<BoardArticles> {
+		const { articleStatus, articleCategory } = input.search;
+		const match: T = {};
+		const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC }; //Standard sort hosl qilayabmiz 
+
+		if (articleStatus) match.articleStatus = articleStatus; //agar spesific aricle status talab etayotgan bolsa Article statusni matchga yuklayabmiz
+		if (articleCategory) match.articleCategory = articleCategory;
+
+		const result = await this.boardArticleModel
+			.aggregate([//arrayni talab etadi 
+				{ $match: match },//comondalarni  iwlatayabmiz
+				{ $sort: sort },//
+				{
+					$facet: {
+						list: [
+							{ $skip: (input.page - 1) * input.limit },
+							{ $limit: input.limit },//skip hamda limitni pagination un yaratayabmiz 
+							lookupMember,//member malumotlarini  board articlega  lookup qilayabmiz
+							{ $unwind: '$memberData' },
+						],
+						metaCounter: [{ $count: 'total' }],//umumiy countni hisoblyabmiz 
+					},
+				},
+			])
+			.exec();
+		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
+		return result[0];
+	}
+
+public async updateBoardArticleByAdmin(input: BoardArticleUpdate): Promise<BoardArticle> {
+		const { _id, articleStatus } = input; 
+
+		const result = await this.boardArticleModel
+			.findOneAndUpdate({ _id: _id, articleStatus: BoardArticleStatus.ACTIVE }, input, {
+               //executing qlib 3 ta rgumentni paste qilayabmiz  1 cisi obj qaysi article  2 inp ozgar article qiy
+				new: true, //3 option yangilangan qiymatni  talab etayabmiz 
+			})
+			.exec();
+		if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
+
+		if (articleStatus === BoardArticleStatus.DELETE) { //deletega ozg qiymati sodir bolgan bolsa
+			await this.memberService.memberStatsEditor({
+				_id: result.memberId,//board article hosl qilgan member id
+				targetKey: 'memberArticles',//unnga tegishli bolgan articleni 
+				modifier: -1, //statistikani bittaga kamaytirayabmiz
+			});
+		}
+
+		return result;
+	}
+
+	public async removeBoardArticleByAdmin(articleId: ObjectId): Promise<BoardArticle> {
+		const search: T = { _id: articleId, articleStatus: BoardArticleStatus.DELETE };//faqatgina deletega ozgargan article larni ochirishga ruxsat berayabmiz
+		const result = await this.boardArticleModel.findOneAndDelete(search).exec();//obj arg sif paste qilayabmiz 
+		if (!result) throw new InternalServerErrorException(Message.REMOVE_FAILED);
+
+		return result;
+	}
+
+
+
 }
