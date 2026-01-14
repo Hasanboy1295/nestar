@@ -46,10 +46,10 @@ export class PropertyResolver {
 	public async updateProperty(
 		//property malumotlarini bizga qayttaradi
 		@Args('input') input: PropertyUpdate, //input hamda memberId PARAMETRDTO
-		@AuthMember('_id') memberId: ObjectId, //Authda member id ni topib beradi memberId
+		@AuthMember('_id') memberId: ObjectId, //Authda member id ni topib beradi memberId murojarchini 
 	): Promise<Property> {
 		console.log('Mutation: updateProperty');
-		input._id = shapeIntoMongoObjectId(input._id);
+		input._id = shapeIntoMongoObjectId(input._id); //shape qilib proprety input const tenglayabmiz 
        return await this.propertyService.updateProperty(memberId, input);
      }
 

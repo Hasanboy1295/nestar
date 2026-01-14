@@ -38,21 +38,17 @@ export class PropertyService {
 	}
 	// GGGSE
 
-	public async getProperty(memberId: ObjectId, propertyId: ObjectId): Promise<Property> {
-		const search: T = {
+	public async getProperty(memberId: ObjectId, propertyId: ObjectId): Promise<Property> { //paramretr type Object id 
+		const search: T = {//search objecti hosil qilayabmiz 
 			_id: propertyId,
-			propertyStatus: PropertyStatus.ACTIVE,  
+			propertyStatus: PropertyStatus.ACTIVE,  //enum orqali activelarni belgilayabmiz
 		};
 
 		const targetProperty: Property = await this.propertyModel.findOne(search).lean().exec();
 		if (!targetProperty) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
 		if (memberId) {
-			const viewInput = {
-				memberId: memberId,
-				viewRefId: propertyId,
-				viewGroup: ViewGroup.PROPERTY,
-			};
+			const viewInput = {	memberId: memberId,	viewRefId: propertyId, viewGroup: ViewGroup.PROPERTY,};//1 object hosil qilib
 
 			const newView = await this.viewService.recordView(viewInput);
 			if (newView) {
@@ -61,16 +57,14 @@ export class PropertyService {
 					targetKey: 'propertyViews',
 					modifier: 1,
 				});
-				targetProperty.propertyViews++;
+				targetProperty.propertyViews++; //databasega borib kelib boldi frontendga qaytarishimiz uchun
 			}
 
 			// meLiked
 		}
-
-		targetProperty.memberData = await this.memberService.getMember(null, targetProperty.memberId);
+		targetProperty.memberData = await this.memberService.getMember(null, targetProperty.memberId); // NULL +> property kim qoshgan malumoti
 		return targetProperty;
 	}
-
 	public async propertyStatsEditor(input: StatisticModifier): Promise<Property> {
 		const { _id, targetKey, modifier } = input;
 		return await this.propertyModel
@@ -84,66 +78,14 @@ export class PropertyService {
 			.exec();
 	}
 
-// public async updateProperty(memberId: ObjectId, input: PropertyUpdate): Promise<Property> {
 
-//   const current = await this.propertyModel.findOne({
-//     _id: input._id,
-//     memberId: memberId,
-//   });
 
-//   if (!current) {
-//     throw new InternalServerErrorException(Message.NO_DATA_FOUND);
-//   }
-
-//   // ❗ faqat ACTIVE bo‘lgan property update qilinadi
-//   if (current.propertyStatus !== PropertyStatus.ACTIVE) {
-//     throw new BadRequestException(Message.NOT_ALLOWED_REQUEST);
-//   }
-
-//   // status bo‘yicha vaqtlarni yozamiz
-//   if (input.propertyStatus === PropertyStatus.SOLD) {
-//     input.soldAt = moment().toDate();
-//   }
-
-//   if (input.propertyStatus === PropertyStatus.DELETE) {
-//     input.deletedAt = moment().toDate();
-//   }
-
-//   const result = await this.propertyModel
-//     .findOneAndUpdate(
-//       { _id: input._id, memberId },
-//       input,
-//       { new: true },
-//     )
-//     .exec();
-
-//   if (!result) {
-//     throw new InternalServerErrorException(Message.UPDATE_FAILED);
-//   }
-
-//   // statni kamaytirish
-//   if (
-//     input.propertyStatus === PropertyStatus.SOLD ||
-//     input.propertyStatus === PropertyStatus.DELETE
-//   ) {
-//     await this.memberService.memberStatsEditor({
-//       _id: memberId,
-//       targetKey: 'memberProperties',
-//       modifier: -1,
-//     });
-//   }
-
-//   return result;
-// }
-public async updateProperty(
-  memberId: ObjectId,
-  input: PropertyUpdate
-): Promise<Property> {
+public async updateProperty(memberId: ObjectId, input: PropertyUpdate): Promise<Property> {
   let { propertyStatus, soldAt, deletedAt } = input;
 
   const search: T = {
     _id: input._id,
-    memberId: memberId,
+    memberId: memberId,//kim property qoshgan bolsa owani ozgina ozgarta olishi mumkin
     propertyStatus: PropertyStatus.ACTIVE,
   };
 
@@ -163,7 +105,7 @@ public async updateProperty(
     await this.memberService.memberStatsEditor({
       _id: memberId,
       targetKey: 'memberProperties',
-      modifier: -1,
+      modifier: -1,// sold yoki delete bolganda propertylar sonini kamaytiramiz
     });
   }
 
@@ -174,7 +116,7 @@ public async updateProperty(
 
 public async getProperties(memberId: ObjectId, input: PropertiesInquiry): Promise<Properties> {
   const match: T = { propertyStatus: PropertyStatus.ACTIVE };
-  const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
+  const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC }; // KEY  DYNAMIK OBJEKT ICHHIDA HOSIL QILAYABMIZ  array sababi key hosil qilayabmiz 
 
   this.shapeMatchQuery(match, input);
   console.log('match:', match);
@@ -219,7 +161,7 @@ private shapeMatchQuery(match: T, input: PropertiesInquiry): void {
 
   if (memberId) match.memberId = shapeIntoMongoObjectId(memberId);
   if (locationList) match.propertyLocation = { $in: locationList };
-  if (roomsList) match.propertyRooms = { $in: roomsList };
+  if (roomsList) match.propertyRooms = { $in: roomsList };//IN include  SEOUL YOKI BUSAN BOLSA BER YOKI BERMA
   if (bedsList) match.propertyBeds = { $in: bedsList };
   if (typeList) match.propertyType = { $in: typeList };
 
@@ -269,14 +211,10 @@ const match: T = {
   return result[0];
 }
 
-public async getAllPropertiesByAdmin( input: AllPropertiesInquiry ): Promise<Properties> {
+public async getAllPropertiesByAdmin(input: AllPropertiesInquiry): Promise<Properties> {
   const { propertyStatus, propertyLocationList } = input.search;
-
-  const match: any = {};
-  const sort: any = {
-    [input?.sort ?? 'createdAt']:
-      input?.direction ?? Direction.DESC,
-  };
+  const match: T = {};
+  const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
 
   if (propertyStatus) match.propertyStatus = propertyStatus;
   if (propertyLocationList) match.propertyLocation = { $in: propertyLocationList };
@@ -290,14 +228,8 @@ public async getAllPropertiesByAdmin( input: AllPropertiesInquiry ): Promise<Pro
           list: [
             { $skip: (input.page - 1) * input.limit },
             { $limit: input.limit },
-            {
-              $lookup: {
-                from: 'members',
-                localField: 'memberId',
-                foreignField: '_id',
-                as: 'memberData',
-              },
-            },
+            lookupMember,
+            { $unwind: '$memberData' },
           ],
           metaCounter: [{ $count: 'total' }],
         },

@@ -1,5 +1,35 @@
 
 
+
+// TASK ZR:
+
+// Shunday function yozing, bu function,
+// berilgan parametr string tarkibidagi raqam va sonlarni
+// sanab object sifatida qaytarsin.
+
+function countNumberAndLetters(str: string): { number: number; letter: number } {
+  let number = 0;
+  let letter = 0;
+
+  for (const ch of str) {
+    if (ch >= '0' && ch <= '9') {
+      number++;
+    } else if (
+      (ch >= 'a' && ch <= 'z') ||
+      (ch >= 'A' && ch <= 'Z')
+    ) {
+      letter++;
+    }
+  }
+
+  return { number, letter };
+
+}
+console.log(countNumberAndLetters("string152%¥"));
+
+
+// MASALAN: countNumberAndLetters(“string152%\¥”); return {number: 3, letter: 6};
+
 // TASK ZQ:
 
 // Shunday function yozing, bu function berilgan array parametr
@@ -7,7 +37,7 @@
 // array'da yagonadan qaytarsin qaytarsin.
 // MASALAN: findDuplicates([1,2,3,4,5,4,3,4]); return [3, 4];
 
-console.log(findDuplicates([1, 2, 3, 4, 5, 4, 3, 4])); 
+//console.log(findDuplicates([1, 2, 3, 4, 5, 4, 3, 4])); 
 function findDuplicates(arr) {
     const counts = {};
     const duplicates = [];
@@ -24,7 +54,7 @@ function findDuplicates(arr) {
         }
     }
 
-    return duplicates;
+    // return duplicates;
 }
 
 // Anagrammalarni Guruhlash
@@ -73,9 +103,9 @@ function groupAnagrams(strs: string[]): string[][] {
 function areArraysEqual(arr1, arr2) {
 	return arr1.every((item) => arr2.includes(item));
 }
-console.log(areArraysEqual([1, 2, 3], [3, 1, 2]));
-console.log(areArraysEqual([1, 2, 3], [3, 1, 2, 1]));
-console.log(areArraysEqual([1, 2, 3], [4, 1, 2]));
+// console.log(areArraysEqual([1, 2, 3], [3, 1, 2]));
+// console.log(areArraysEqual([1, 2, 3], [3, 1, 2, 1]));
+// console.log(areArraysEqual([1, 2, 3], [4, 1, 2]));
 
 // TASK ZN:
 
@@ -94,7 +124,7 @@ function rotateArray(arr, index) {
 	const i = index % arr.length;
 	return [...arr.slice(i), ...arr.slice(0, i)];
 }
-console.log(rotateArray([1, 2, 3, 4, 5, 6], 3));
+// console.log(rotateArray([1, 2, 3, 4, 5, 6], 3));
 
 // ZL-TASK:
 

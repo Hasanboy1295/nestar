@@ -77,7 +77,7 @@ export class Property {
 	@Field(() => Date)
 	updatedAt: Date;
 
-	//FOR AGREGATION
+	//FROM AGREGATION
 
 	@Field(() => Member, { nullable: true })
 	memberData?: Member;

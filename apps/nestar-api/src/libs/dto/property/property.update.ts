@@ -69,6 +69,7 @@ export class PropertyUpdate {
   propertyRent?: boolean;
 
   soldAt?: Date;
+  
   deletedAt?: Date;
 
   @IsOptional()
