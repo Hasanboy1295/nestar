@@ -154,17 +154,12 @@ export class MemberService {
 		if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
 		return result;
 	}
+
+	
+
 	public async memberStatsEditor(input: StatisticModifier): Promise<Member> {
-		const { _id, targetKey, modifier } = input; //destraction
-		return await this.memberModel
-			.findOneAndUpdate(
-				_id, //update qilayabdi idni
-				{
-					$inc: { [targetKey]: modifier }, //dynamic key 🔹 $inc — raqamni oshirish / kamaytirish
-				},
-				{ new: true },
-			)
-			.exec(); //Property qoshganda va olinganda ishlatilinadi
+		const { _id, targetKey, modifier } = input;
+		return await this.memberModel.findByIdAndUpdate(_id, { $inc: { [targetKey]: modifier } }, { new: true }).exec();
 	}
 }
 
