@@ -25,10 +25,11 @@ export class BoardArticleService {
 
 	public async createBoardArticle(memberId: ObjectId, input: BoardArticleInput): Promise<BoardArticle> {
 		input.memberId = memberId; //imputni memberId sini kirib kelgan memberId ga teglashtiryapmiz
-		try {
+		try { //Create qilayotganimizda  MONGO DB DA xar xatolik bolishi mumkin shunga try catch ichida yozayabmiz
+			//Qolgan yerda data qaytadi update yoki delete  SCHEAM VALIDATION ERROR
 			const result = await this.boardArticleModel.create(input);
 			await this.memberService.memberStatsEditor({//memberSer Instencedan  memberStatsEditor chaqirayabmiz  
-				_id: memberId, //arg
+				_id: memberId, //arg            //OBJECT 1 ta 
 				targetKey: 'memberArticles',
 				modifier: 1,
 			});
@@ -51,21 +52,18 @@ export class BoardArticleService {
 		if (!targetBoardArticle) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
 		if (memberId) { //Agar murojatjimiz Authenticted bolgan bolsa shu mantiq ishga tushadi 
-			const viewInput = { memberId: memberId, viewRefId: articleId, viewGroup: ViewGroup.ARTICLE };
+			const viewInput = { memberId: memberId, viewRefId: articleId, viewGroup: ViewGroup.ARTICLE };//VIEW \ NULL korgan bolsa Null Qaytadi kormagan bolsa view qaytadi
 			const newView = await this.viewService.recordView(viewInput);
-			   console.log('Service: heLOOOOOOOOOONDN(createBoardArticle');
 			
 			if (newView) {
 				await this.boardArticleStatsEditor({ _id: articleId, targetKey: 'articleViews', modifier: 1 });
-				targetBoardArticle.articleViews++;
+				targetBoardArticle.articleViews++; //opbject 
 			}
 
 			//meLiked
-
-
 		}
 
-		targetBoardArticle.memberData = await this.memberService.getMember(null, targetBoardArticle.memberId);
+		targetBoardArticle.memberData = await this.memberService.getMember(null, targetBoardArticle.memberId);//memberData ARTICLENE korgan inson 
 		return targetBoardArticle;
 	}
   
@@ -74,7 +72,7 @@ export class BoardArticleService {
 		const { _id, articleStatus } = input;
 
 		const result = await this.boardArticleModel
-			.findOneAndUpdate({ _id: _id, memberId: memberId, articleStatus: BoardArticleStatus.ACTIVE }, input, {
+			.findOneAndUpdate({ _id: _id, memberId: memberId, articleStatus: BoardArticleStatus.ACTIVE }, input, {//1 obj
 				new: true,
 			})
 			.exec();
@@ -95,29 +93,29 @@ export class BoardArticleService {
 	public async getBoardArticles(memberId: ObjectId, input: BoardArticlesInquiry): Promise<BoardArticles> {
 		const { articleCategory, text } = input.search;
 		const match: T = { articleStatus: BoardArticleStatus.ACTIVE };
-		const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
+		const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };//Dynamic key 
+		//sortdan Direction celmasa Createfd at -1 boladi
 
-		if (articleCategory) match.articleCategory = articleCategory;
+		if (articleCategory) match.articleCategory = articleCategory; //match ga qoshb berayabmiz 
 		if (text) match.articleTitle = { $regex: new RegExp(text, 'i') };
 		if (input.search?.memberId) {
 			match.memberId = shapeIntoMongoObjectId(input.search.memberId);
 		}
 		console.log('match:', match);
-
 		const result = await this.boardArticleModel
 			.aggregate([
 				{ $match: match },
 				{ $sort: sort },
 				{
 					$facet: {
-						list: [
+						list: [//list ichida Pagiationni amalga oshirayabmiz
 							{ $skip: (input.page - 1) * input.limit },
 							{ $limit: input.limit },
 //Me liked 
-							lookupMember,
+							lookupMember,//object  
 							{ $unwind: '$memberData' },
 						],
-						metaCounter: [{ $count: 'total' }],
+						metaCounter: [{ $count: 'total' }],//databasedagi umumiy malumot 
 					},
 				},
 			])
@@ -213,7 +211,4 @@ public async updateBoardArticleByAdmin(input: BoardArticleUpdate): Promise<Board
 
 		return result;
 	}
-
-
-
 }

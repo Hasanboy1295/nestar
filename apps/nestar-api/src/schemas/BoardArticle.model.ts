@@ -1,7 +1,7 @@
 import { Schema } from 'mongoose';
 import { BoardArticleCategory, BoardArticleStatus } from '../libs/enums/board-article.enum';
 
-const BoardArticleSchema = new Schema(
+const BoardArticleSchema = new Schema(  //BoardArticleSchema VALIDATAR OBJECT  Feature 
 	{
 		articleCategory: {
 			type: String,

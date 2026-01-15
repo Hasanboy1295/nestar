@@ -14,9 +14,9 @@ import { BoardArticleService } from './board-article.service';
         MongooseModule.forFeature([
             {
                 name: 'BoardArticle',
-                schema: BoardArticleSchema,
+                schema: BoardArticleSchema,// Object BoardArticleSchema  orqali 
             },
-        ]),
+        ]), //Schheam Modelmi Object orqali qurayabmiz
         AuthModule,
         MemberModule,
         ViewModule,

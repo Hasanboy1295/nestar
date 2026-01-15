@@ -21,7 +21,7 @@ export class BoardArticleResolver {
    	@UseGuards(AuthGuard)
 	@Mutation((returns) => BoardArticle)
 	public async createBoardArticle(
-		@Args('input') input: BoardArticleInput,
+		@Args('input') input: BoardArticleInput,//inputda board article typeni belgilayabmiz 
 		@AuthMember('_id') memberId: ObjectId,
 	): Promise<BoardArticle> {
 		console.log('Mutation: createBoardArticle');
