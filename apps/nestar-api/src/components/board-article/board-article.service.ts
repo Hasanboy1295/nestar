@@ -65,6 +65,10 @@ export class BoardArticleService {
 			}
 
 			//meLiked
+
+      	const LikeInput = { memberId: memberId, likeRefId: articleId, likeGroup: LikeGroup.ARTICLE };
+		targetBoardArticle.meLiked = await this.likeService.checkLikeExistence(LikeInput);
+			
 		}
 
 		targetBoardArticle.memberData = await this.memberService.getMember(null, targetBoardArticle.memberId);//memberData ARTICLENE korgan inson 
