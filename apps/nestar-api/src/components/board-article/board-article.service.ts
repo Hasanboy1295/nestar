@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+ import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId  } from 'mongoose';
 import { BoardArticle, BoardArticles } from '../../libs/dto/board-article/board-article';
@@ -27,11 +27,11 @@ export class BoardArticleService {
 		input.memberId = memberId; //imputni memberId sini kirib kelgan memberId ga teglashtiryapmiz
 		try { //Create qilayotganimizda  MONGO DB DA xar xatolik bolishi mumkin shunga try catch ichida yozayabmiz
 			//Qolgan yerda data qaytadi update yoki delete  SCHEAM VALIDATION ERROR
-			const result = await this.boardArticleModel.create(input);
+			const result = await this.boardArticleModel.create(input);//static method 
 			await this.memberService.memberStatsEditor({//memberSer Instencedan  memberStatsEditor chaqirayabmiz  
 				_id: memberId, //arg            //OBJECT 1 ta 
 				targetKey: 'memberArticles',
-				modifier: 1,
+				modifier: 1,   
 			});
 			//memberArticle statistikasini bittaga oshiradi
 
@@ -170,7 +170,7 @@ public async boardArticleStatsEditor(input: StatisticModifier): Promise<BoardArt
 							{ $skip: (input.page - 1) * input.limit },
 							{ $limit: input.limit },//skip hamda limitni pagination un yaratayabmiz 
 							lookupMember,//member malumotlarini  board articlega  lookup qilayabmiz
-							{ $unwind: '$memberData' },
+							{ $unwind: '$memberData' },//[]0 => arrayni objectga 
 						],
 						metaCounter: [{ $count: 'total' }],//umumiy countni hisoblyabmiz 
 					},
@@ -198,7 +198,7 @@ public async updateBoardArticleByAdmin(input: BoardArticleUpdate): Promise<Board
 				_id: result.memberId,//board article hosl qilgan member id
 				targetKey: 'memberArticles',//unnga tegishli bolgan articleni 
 				modifier: -1, //statistikani bittaga kamaytirayabmiz
-			});
+			});//1filter/ 2.update 3. option
 		}
 
 		return result;

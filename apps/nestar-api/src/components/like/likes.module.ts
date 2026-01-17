@@ -12,7 +12,6 @@ import { LikeService } from './likes.service';
 			},
 		]),
 	],
-
 	providers: [LikeService],
 	exports: [LikeService],
 })

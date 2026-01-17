@@ -5,6 +5,7 @@ import MemberSchema from '../../schemas/Member.model';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from '../auth/auth.module';
 import { ViewModule } from '../view/view.module';
+import { LikeModule } from '../like/likes.module';
 
 @Module({
 	imports: [
@@ -16,6 +17,7 @@ import { ViewModule } from '../view/view.module';
 		]),
 		AuthModule, //koprik member modelga auth modelni chaqir
 		ViewModule, // IMPORT 2
+		LikeModule,
 	],
 	providers: [
 		MemberResolver,

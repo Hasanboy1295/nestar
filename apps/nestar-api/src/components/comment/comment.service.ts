@@ -18,24 +18,25 @@ export class CommentService {
 		@InjectModel('Comment') private readonly commentModel: Model<Comment>,
 		private readonly memberService: MemberService,
 		private readonly propertyService: PropertyService,
-		private readonly boardArticleService: BoardArticleService,
+		private readonly boardArticleService: BoardArticleService, 
 	) {}
 
-	public async createComment(memberId: ObjectId, input: CommentInput): Promise<Comment> {
-		input.memberId = memberId; //imputni memberId sini kirib kelgan memberId ga teglashtiryapmiz
+	public async createComment(memberId: ObjectId, input: CommentInput): Promise<Comment> {//bor
+		input.memberId = memberId; //imputni memberId mi boyitayabmiz
 
-		let result = null;
-		try {
-			result = await this.commentModel.create(input);
+		 //Frontend Backend DTON DataBASE validation 
+		let result = null;//0 ozgaruvchiga
+		try { //
+			result = await this.commentModel.create(input);//static //argument sifatida qabul qildi 
 		} catch (err) {
-			console.log('Error, Comment service model:', err.message);
+			console.log('Error, Comment service model:', err.message);//Scheam validation bolgani un errorni handele qilaaybman 
 			throw new BadRequestException(Message.CREATE_FAILED);
 		}
-
+    
 		switch (input.commentGroup) {
 			case CommentGroup.PROPERTY:
 				await this.propertyService.propertyStatsEditor({
-					_id: input.commentRefId,
+					_id: input.commentRefId,//ser model
 					targetKey: 'propertyComments',
 					modifier: 1,
 				});
@@ -62,14 +63,9 @@ export class CommentService {
 
 	public async updateComment(memberId: ObjectId, input: CommentUpdate): Promise<Comment> {
 	const { _id } = input;
-console.log({
-  _id: _id,
-  memberId: memberId,
-  commentStatus: CommentStatus.ACTIVE,
-});
 	const result = await this.commentModel.findOneAndUpdate(
 		{
-			_id: _id,
+			_id: _id,//comment id 
 			memberId: memberId,
 			commentStatus: CommentStatus.ACTIVE,
 		},
@@ -87,7 +83,7 @@ console.log({
 
 
 	public async getComments(memberId: ObjectId, input: CommentsInquiry): Promise<Comments> {
-		const { commentRefId } = input.search;
+		const { commentRefId } = input.search;//destructuring
 		const match: T = { commentRefId: commentRefId, commentStatus: CommentStatus.ACTIVE };
 		const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
 
@@ -117,7 +113,7 @@ console.log({
 	//================= Admin Mutations ===================//
 
 
-	public async removeCommentByAdmin(input: ObjectId): Promise<Comment> {
+	public async removeCommentByAdmin(input: ObjectId): Promise<Comment> {//DTO 
 		const result = await this.commentModel.findByIdAndDelete(input);
 		if (!result) throw new InternalServerErrorException(Message.REMOVE_FAILED);
 		return result;

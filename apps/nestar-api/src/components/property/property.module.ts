@@ -6,6 +6,7 @@ import { AuthModule } from '../auth/auth.module';
 import { ViewModule } from '../view/view.module';
 import PropertySchema from '../../schemas/Property.model';
 import { MemberModule } from '../member/member.module';
+import { LikeModule } from '../like/likes.module';
 
 @Module({
 	//MODULE DECARATORLARNI ORNATIB OLDIK
@@ -19,6 +20,7 @@ import { MemberModule } from '../member/member.module';
 		AuthModule, //koprik member modelga auth modelni chaqir
 		ViewModule,
 		MemberModule,  // IMPORT 2
+		LikeModule,
 	],
 	providers: [PropertyResolver, PropertyService],
 	  exports: [PropertyService]

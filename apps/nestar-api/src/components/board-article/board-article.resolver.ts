@@ -22,10 +22,10 @@ export class BoardArticleResolver {
 	@Mutation((returns) => BoardArticle)
 	public async createBoardArticle(
 		@Args('input') input: BoardArticleInput,//inputda board article typeni belgilayabmiz 
-		@AuthMember('_id') memberId: ObjectId,
+		@AuthMember('_id') memberId: ObjectId, //acces tooken dan kelayabdi 
 	): Promise<BoardArticle> {
 		console.log('Mutation: createBoardArticle');
-		return await this.boardArticleService.createBoardArticle(memberId, input);
+		return await this.boardArticleService.createBoardArticle(memberId, input); 
 	}
 
 	@UseGuards(WithoutGuard)
@@ -35,7 +35,7 @@ export class BoardArticleResolver {
 		@AuthMember('_id') memberId: ObjectId,//agar auth bolgan bolsk memberId olib beradi bolmasak Null olib beradi
 	): Promise<BoardArticle> {
 		console.log('Query: getBoardArticle');
-		const articleId = shapeIntoMongoObjectId(input);
+		const articleId = shapeIntoMongoObjectId(input);//
 		return await this.boardArticleService.getBoardArticle(memberId, articleId);
 	}
 

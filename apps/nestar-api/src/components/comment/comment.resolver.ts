@@ -17,27 +17,27 @@ import { MemberType } from '../../libs/member.enum';
 export class CommentResolver {
 	constructor(private readonly commentService: CommentService) {}
  
-	@UseGuards(AuthGuard)
-	@Mutation(() => Comment)
+	@UseGuards(AuthGuard)//Authentiation 
+	@Mutation(() => Comment)//
 	public async createComment(
 		@Args('input') input: CommentInput,
 		@AuthMember('_id') memberId: ObjectId,
 	): Promise<Comment> {
 		console.log('Mutation: createComment');
-		return await this.commentService.createComment(memberId, input);
+		return await this.commentService.createComment(memberId, input);//methodga 
 	}
 
-	@UseGuards(AuthGuard)
+	@UseGuards(AuthGuard)//Auu
 	@Mutation(() => Comment)
 	public async updateComment(
 		@Args('input') input: CommentUpdate,
 		@AuthMember('_id') memberId: ObjectId,
 	): Promise<Comment> {
 		console.log('Mutation: updateComment');
-		return await this.commentService.updateComment(memberId, input);
+		return await this.commentService.updateComment(memberId, input);//call
 	}
 
-	@UseGuards(WithoutGuard)
+	@UseGuards(WithoutGuard)//retriver
 	@Query(() => Comments)
 	public async getComments(
 		@Args('input') input: CommentsInquiry,

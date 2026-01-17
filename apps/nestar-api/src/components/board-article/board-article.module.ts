@@ -7,6 +7,7 @@ import { MemberModule } from '../member/member.module';
 import { ViewModule } from '../view/view.module';
 import { BoardArticleResolver } from './board-article.resolver';
 import { BoardArticleService } from './board-article.service';
+import { LikeModule } from '../like/likes.module';
 
 
 @Module({
@@ -17,9 +18,10 @@ import { BoardArticleService } from './board-article.service';
                 schema: BoardArticleSchema,// Object BoardArticleSchema  orqali 
             },
         ]), //Schheam Modelmi Object orqali qurayabmiz
-        AuthModule,
+        AuthModule,//import
         MemberModule,
         ViewModule,
+        LikeModule,
     ],
     providers: [BoardArticleResolver, BoardArticleService],
     exports: [BoardArticleService],
