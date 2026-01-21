@@ -12,7 +12,7 @@ import { BoardArticleUpdate } from '../../libs/dto/board-article/board-article.u
 import { ViewGroup } from '../../libs/enums/view.enum';
 import { Property } from '../../libs/dto/property/property';
 import { PropertyStatus } from '../../libs/enums/property.enum';
-import { lookupMember, shapeIntoMongoObjectId } from '../../libs/config';
+import { lookupAuthMemberLiked, lookupMember, shapeIntoMongoObjectId } from '../../libs/config';
 import { LikeService } from '../like/likes.service';
 import { LikeGroup } from '../../libs/enums/like.enum';
 import { LikeInput } from '../../libs/dto/like/like.input';
@@ -120,6 +120,7 @@ export class BoardArticleService {
 							{ $skip: (input.page - 1) * input.limit },
 							{ $limit: input.limit },
 //Me liked 
+		                    lookupAuthMemberLiked(memberId),
 							lookupMember,//object  
 							{ $unwind: '$memberData' },
 						],

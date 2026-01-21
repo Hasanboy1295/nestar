@@ -13,6 +13,7 @@ import { ViewGroup } from '../../libs/enums/view.enum';
 import { LikeService } from '../like/likes.service';
 import { LikeInput } from '../../libs/dto/like/like.input';
 import { LikeGroup } from '../../libs/enums/like.enum';
+import { lookupAuthMemberLiked, shapeIntoMongoObjectId } from '../../libs/config';
 
 @Injectable()
 export class MemberService {
@@ -117,7 +118,13 @@ export class MemberService {
 				{ $sort: sort },
 				{
 					$facet: { //pipi =>pipe 
-						list: [{ $skip: (input.page - 1) * input.limit }, { $limit: input.limit }],
+						list: [{ $skip: (input.page - 1) * input.limit },
+							 { $limit: input.limit },
+						 lookupAuthMemberLiked(memberId),
+						//	lookupAuthMemberLiked(memberId ? shapeIntoMongoObjectId(memberId) : null),
+							
+							],
+							
 						metaCounter: [{ $count: 'total' }],
 					}, //Bit nechhta pipelinelrni chaqrish un
 				},
