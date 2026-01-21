@@ -28,26 +28,26 @@ export class FollowResolver {
 		const followingId = shapeIntoMongoObjectId(input);
 		return await this.followService.unsubscribe(memberId, followingId);
 	}
-
-	@UseGuards(WithoutGuard)
-	@Query((returns) => Followings)
+	@Query(() => Followings)
 	public async getMemberFollowings(
+		//qachoonga boshqa memberga follw qilmoqchi bolsek ishga tushadi
 		@Args('input') input: FollowInquiry,
 		@AuthMember('_id') memberId: ObjectId,
 	): Promise<Followings> {
-		console.log('Query: getMemberFollowings');
+		console.log('Mutation: getMemberFollowings');
 		const { followerId } = input.search;
 		input.search.followerId = shapeIntoMongoObjectId(followerId);
 		return await this.followService.getMemberFollowings(memberId, input);
 	}
 
 	@UseGuards(WithoutGuard)
-	@Query((returns) => Followers)
+	@Query(() => Followers)
 	public async getMemberFollowers(
+		//qachoonga boshqa memberga follw qilmoqchi bolsek ishga tushadi
 		@Args('input') input: FollowInquiry,
 		@AuthMember('_id') memberId: ObjectId,
 	): Promise<Followers> {
-		console.log('Query: getMemberFollowers');
+		console.log('Mutation: getMemberFollowers');
 		const { followingId } = input.search;
 		input.search.followingId = shapeIntoMongoObjectId(followingId);
 		return await this.followService.getMemberFollowers(memberId, input);
