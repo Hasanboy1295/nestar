@@ -41,40 +41,36 @@ export class LikeService {
 		const result = await this.LikeModel.findOne({ memberId: memberId, likeRefId: likeRefId }).exec();
 		return result ? [{ memberId: memberId, likeRefId: likeRefId, myFavorite: true }] : [];
 	}
+public async getFavoriteProperties(memberId: ObjectId, input: OrdinaryInquiry): Promise<Properties> {
+    const { page, limit } = input;
+    const match: T = { likeGroup: LikeGroup.PROPERTY, memberId: memberId }; //likes collectionida like bosgan propertylarimizi izlayapmiz
 
-	public async getFavoriteProperties(memberId: ObjectId, input: OrdinaryInquiry): Promise<Properties> {
-		const { page, limit } = input;
-		const match: T = { likeGroup: LikeGroup.PROPERTY, memberId: memberId }; //likes collectionida like bosgan propertylarimizi izlayapmiz
-
-		const data: T = await this.LikeModel.aggregate([
-			{ $match: match },
-			{ $sort: { updatedAt: -1 } }, //eng ohirgi qoygan likedan olib beradi
-			{
-				$lookup: {
-					from: 'properties',
-					localField: 'likeRefId',
-					foreignField: '_id',
-					as: 'favoriteProperty',
-				},
-			},
-			{ $unwind: '$favoriteProperty' },//oddiy aray ichidan tashqariga chiqarib  berishini talab etayabmiz
-			{
-				$facet: {
-					list: [
-						{ $skip: (page - 1) * limit },
-						{ $limit: limit },
-				lookupFavorite,
-						{ $unwind: '$favoriteProperty.memberData' },
-					],
-					metaCounter: [{ $count: 'total' }],
-				},
-			},
-		]).exec();
-
-		const result: Properties = { list: [], metaCounter: data[0].metaCounter };
-		result.list = data[0].list.map((ele) => ele.favoriteProperty);
-		
-		return result;
-	}  
-	
+    const data: T = await this.LikeModel.aggregate([
+        { $match: match },
+        { $sort: { updatedAt: -1 } }, //eng ohirgi qoygan likedan olib beradi
+        {
+            $lookup: {
+                from: 'properties',
+                localField: 'likeRefId',
+                foreignField: '_id',
+                as: 'favoriteProperty',
+            },
+        },
+        { $unwind: '$favoriteProperty' },
+        {
+            $facet: {
+                list: [
+                    { $skip: (page - 1) * limit },
+                    { $limit: limit },
+                    lookupFavorite,
+                    { $unwind: '$favoriteProperty.memberData' },
+                ],
+                metaCounter: [{ $count: 'total' }],
+            },
+        },
+    ]).exec();
+    const result: Properties = { list: [], metaCounter: data[0].metaCounter };
+    result.list = data[0].list.map((ele) => ele.favoriteProperty);
+    return result;
+}
 }
