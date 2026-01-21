@@ -10,7 +10,7 @@ import { StatisticModifier, T } from '../../libs/types/common';
 import { PropertyStatus } from '../../libs/enums/property.enum';
 import { ViewService } from '../view/view.service';
 import { PropertyUpdate } from '../../libs/dto/property/property.update';
-import { lookupMember, shapeIntoMongoObjectId } from '../../libs/config';
+import { lookupAuthMemberLiked, lookupMember, shapeIntoMongoObjectId } from '../../libs/config';
 import * as moment from 'moment'; 
 import { Member } from '../../libs/dto/member/member';
 import { LikeInput } from '../../libs/dto/like/like.input';
@@ -140,6 +140,7 @@ public async getProperties(memberId: ObjectId, input: PropertiesInquiry): Promis
             { $skip: (input.page - 1) * input.limit },
             { $limit: input.limit },
             // meLiked
+            lookupAuthMemberLiked(memberId),
             lookupMember,
             { $unwind: '$memberData' },
           ],
