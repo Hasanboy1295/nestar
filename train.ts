@@ -1,4 +1,52 @@
 
+//  TASK ZT:
+
+// Shunday function yozing, bu function parametrdagi string ichida
+// bir marotabadan ortiq qaytarilmagan birinchi harf indeksini qaytarsin
+
+// MASALAN: firstUniqueCharIndex(“stamp”); return 0;
+
+// Yuqoridagi misolda, 'stamp' so'zi tarkibida barcha harflar bir marotabadan
+// ortiq takrorlanmagan, lekin shartga muvofiq, birinchi topilgan harf indeksi qaytarilmoqda.
+
+function firstUniqueCharIndex(str) {
+  const count = {};
+
+  // 1-qadam: harflar sonini sanash
+  for (let char of str) {
+    count[char] = (count[char] || 0) + 1;
+  }
+
+  // 2-qadam: birinchi unique harfni topish
+  for (let i = 0; i < str.length; i++) {
+    if (count[str[i]] === 1) {
+      return i;
+    }
+  }
+
+  return -1; // agar topilmasa
+}
+console.log(firstUniqueCharIndex("stamp"));
+
+
+// TASK ZS:
+
+// Shunday function yozing, bu function parametrdagi array ichida
+// bir marotaba takrorlangan element'ni qaytarsin
+
+// MASALAN: singleNumber([4, 2, 1, 2, 1]); return 4;
+
+function singleNumber(arr) {
+  let result = 0;
+
+  for (let num of arr) {
+    result ^= num;
+  }
+
+  return result;
+}
+console.log(singleNumber([4, 2, 1, 2, 1])); 
+
 
 
 // TASK ZR:
@@ -25,7 +73,7 @@ function countNumberAndLetters(str: string): { number: number; letter: number } 
   return { number, letter };
 
 }
-console.log(countNumberAndLetters("string152%¥"));
+// console.log(countNumberAndLetters("string152%¥"));
 
 
 // MASALAN: countNumberAndLetters(“string152%\¥”); return {number: 3, letter: 6};
