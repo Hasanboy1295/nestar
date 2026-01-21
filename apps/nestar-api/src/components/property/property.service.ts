@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, InternalServerErrorException } from '@
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId, Schema } from 'mongoose';
 import { Properties, Property } from '../../libs/dto/property/property';
-import { AgentPropertiesInquiry, AllPropertiesInquiry, PropertiesInquiry, PropertyInput } from '../../libs/dto/property/property.input';
+import { AgentPropertiesInquiry, AllPropertiesInquiry, OrdinaryInquiry, PropertiesInquiry, PropertyInput } from '../../libs/dto/property/property.input';
 import {  Direction, Message } from '../../libs/enums/common.enum';
 import { MemberService } from '../member/member.service';
 import { ViewGroup } from '../../libs/enums/view.enum';
@@ -190,6 +190,48 @@ private shapeMatchQuery(match: T, input: PropertiesInquiry): void {
 
   //LIKE 
 
+public async getFavorites(memberId: ObjectId, input: OrdinaryInquiry): Promise<Properties> {
+		return await this.likeService.getFavoriteProperties(memberId, input);
+	}
+
+	public async getVisited(memberId: ObjectId, input: OrdinaryInquiry): Promise<Properties> {
+		return await this.viewService.getVisitedProperties(memberId, input);
+	}
+
+	// public async getAgentProperties(memberId: ObjectId, input: AgentPropertiesInquiry): Promise<Properties> {
+	// 	const { propertyStatus } = input.search;
+	// 	if (propertyStatus === PropertyStatus.DELETE) throw new BadRequestException(Message.NOT_ALLOWED_REQUEST);
+
+	// 	const match: T = {
+	// 		memberId: memberId,
+	// 		propertyStatus: propertyStatus ?? { $ne: PropertyStatus.DELETE },
+	// 	};
+	// 	const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
+
+	// 	const result = await this.propertyModel
+	// 		.aggregate([
+	// 			{ $match: match },
+	// 			{ $sort: sort },
+	// 			{
+	// 				$facet: {
+	// 					list: [
+	// 						{ $skip: (input.page - 1) * input.limit },
+	// 						{ $limit: input.limit },
+	// 						lookupMember,
+	// 						{ $unwind: '$memberData' },
+	// 					],
+	// 					metaCounter: [{ $count: 'total' }],
+	// 				},
+	// 			},
+	// 		])
+	// 		.exec();
+	// 	if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
+	// 	return result[0];
+	// }
+
+
+
     public async likeTargetProperty(memberId: ObjectId, likeRefId: ObjectId): Promise<Property> {
     const target: Property = await this.propertyModel.findOne({ _id: likeRefId, propertyStatus: PropertyStatus.ACTIVE }).exec();
     if (!target) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
@@ -209,7 +251,6 @@ private shapeMatchQuery(match: T, input: PropertiesInquiry): void {
   }
   
   
-
 // AGENT PROPERTIES
 public async getAgentProperties(memberId: ObjectId, input: AgentPropertiesInquiry ): Promise<Properties> { 
   const { propertyStatus } = input.search;

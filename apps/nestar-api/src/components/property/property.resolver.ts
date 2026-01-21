@@ -1,7 +1,7 @@
 import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
 import { PropertyService } from './property.service';
 import { Properties, Property } from '../../libs/dto/property/property';
-import { AgentPropertiesInquiry, AllPropertiesInquiry, PropertiesInquiry, PropertyInput } from '../../libs/dto/property/property.input';
+import { AgentPropertiesInquiry, AllPropertiesInquiry, OrdinaryInquiry, PropertiesInquiry, PropertyInput } from '../../libs/dto/property/property.input';
 import { MemberType } from '../../libs/member.enum';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UseGuards } from '@nestjs/common';
@@ -78,6 +78,30 @@ public async getAgentProperties(
 }
 
 //LIKE
+
+//========
+	@UseGuards(AuthGuard)
+	@Query((returns) => Properties)
+	public async getFavorites(
+		@Args('input') input: OrdinaryInquiry,
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<Properties> {
+		console.log('Query: getFavorites');
+		return await this.propertyService.getFavorites(memberId, input);
+	}
+
+
+		@UseGuards(AuthGuard)
+	@Query((returns) => Properties)
+	public async getVisited(
+		@Args('input') input: OrdinaryInquiry,
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<Properties> {
+		console.log('Query: getVisited');
+		return await this.propertyService.getVisited(memberId, input);
+	}
+
+
 	@UseGuards(AuthGuard)
 	@Mutation(() => Property)
 	public async likeTargetProperty(
@@ -124,6 +148,8 @@ public async removePropertyByAdmin(
   const propertyId = shapeIntoMongoObjectId(input);
   return await this.propertyService.removePropertyByAdmin(propertyId);
 }
+
+
 	}
 
 

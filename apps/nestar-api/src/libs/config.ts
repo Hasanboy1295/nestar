@@ -127,8 +127,7 @@ export const lookupAuthMemberFollowed = (input: lookupAuthMemberFollowed) => {
 					$match: {
 						$expr: {
 							//aynan nimalarni solishtirishimizni belgilaypamiz
-							$and: [{ $eq: ['$followerId', '$$localFollowerId'] }, 
-							{ $eq: ['$followingId', '$$localFollowingId'] }], //ikkalasin teng holatini izla
+							$and: [{ $eq: ['$followerId', '$$localFollowerId'] }, { $eq: ['$followingId', '$$localFollowingId'] }], //ikkalasin teng holatini izla
 							//memberId ni localLikeRefId ga teng bolgan holatin izla
 						},
 					},
@@ -177,3 +176,20 @@ export const lookupFollowerData = {
 };
 
 
+export const lookupFavorite  = {
+	$lookup: {
+		from: 'members',
+		localField: 'favouriteProperty.memberId',
+		foreignField: '_id',
+		as: 'favouriteProperty.memberData',
+	},
+}
+
+	export const lookupVisit​​  = {
+	$lookup: {
+		from: 'members',
+		localField: 'visitedProperty.memberId',
+		foreignField: '_id',
+		as: 'visitedProperty.memberData',
+	},
+};
