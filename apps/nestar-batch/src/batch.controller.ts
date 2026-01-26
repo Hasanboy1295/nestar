@@ -13,7 +13,7 @@ export class BatchController {
 		this.logger.debug('BATCH SERVER READY!'); //faqat bir marta ishga tushadi
 	}
 
-	@Cron(' 00 * * * * *', { name: BATCH_ROLLERBACK })
+	@Cron(' 00 00 01 * * *', { name: BATCH_ROLLERBACK })
 	public async batchRollback() {
 		try {
 			this.logger['context'] = BATCH_ROLLERBACK;
@@ -24,23 +24,23 @@ export class BatchController {
 		}
 	}
 
-	@Cron(' 20 * * * * *', { name: BATCH_TOP_PROPERTIES })
+	@Cron(' 20 00 01 * * *', { name: BATCH_TOP_PROPERTIES })
 	public async batchTopProperties() {
 		try {
 			this.logger['context'] = BATCH_TOP_PROPERTIES;
 			this.logger.debug('EXECUTED');
-			await this.batchService.batchProperties();
+			await this.batchService.batchTopProperties();
 		} catch (err) {
 			this.logger.error(err);
 		}
 	}
 
-	@Cron(' 40 * * * * *', { name: BATCH_TOP_AGENTS })
+	@Cron(' 40 00 01 * * *', { name: BATCH_TOP_AGENTS })
 	public async batchTopAgents() {
 		try {
 			this.logger['context'] = BATCH_TOP_AGENTS;
 			this.logger.debug('EXECUTED');
-			await this.batchService.batchAgents();
+			await this.batchService.batchTopAgents();
 		} catch (err) {
 			this.logger.error(err);
 		}
