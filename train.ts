@@ -1,4 +1,41 @@
 
+
+// TASK ZU:
+
+// Shunday function yozing, va bu function parametr sifatida
+// raqamlardan iborat array'ni qabul qilsin. Function'ning vazifasi,
+// berilgan parametr array tarkibida takrorlanmagan raqamlarni topib
+// ularni yig'indisini qaytarsin.
+
+// MASALAN: sumOfUnique([1,2,3,2]); return 4;
+
+// Yuqoridagi misolda, argument sifatida pass qilinayotgan array
+// tarkibida bir marotabadan ortiq takrorlanmagan raqamlar, bular '1', '3'.
+// Va natija sifatida yig'indi 4'ga teng.
+
+function sumOfUnique(arr) {
+  const countMap = {};
+
+  // Har bir son necha marta qatnashganini sanaymiz
+  for (let num of arr) {
+    countMap[num] = (countMap[num] || 0) + 1;
+  }
+
+  let sum = 0;
+
+  // Faqat 1 marta uchraganlarni qo‘shamiz
+  for (let num in countMap) {
+    if (countMap[num] === 1) {
+      sum += Number(num);
+    }
+  }
+
+  return sum;
+}
+console.log(sumOfUnique([1, 2, 3, 2]));
+
+
+
 //  TASK ZT:
 
 // Shunday function yozing, bu function parametrdagi string ichida
@@ -26,7 +63,7 @@ function firstUniqueCharIndex(str) {
 
   return -1; // agar topilmasa
 }
-console.log(firstUniqueCharIndex("stamp"));
+// console.log(firstUniqueCharIndex("stamp"));
 
 
 // TASK ZS:
@@ -45,7 +82,7 @@ function singleNumber(arr) {
 
   return result;
 }
-console.log(singleNumber([4, 2, 1, 2, 1])); 
+ // console.log(singleNumber([4, 2, 1, 2, 1])); 
 
 
 
@@ -212,7 +249,7 @@ function reverseInteger(num) {
 // MASALAN: printNumbers();
 
 function printNumbers() {
-	let i = 1;
+	 let i = 1;
 
 	const intervalId = setInterval(() => {
 		console.log(i);
