@@ -8,6 +8,7 @@ import { AppResolver } from './app.resolver';
 import { DatabaseModule } from './database/database.module';
 import { ComponentsModule } from './components/components.module';
 import { T } from './libs/types/common';
+import { SocketModule } from './socket/socket.module';
  
 @Module({
 	imports: [//property
@@ -28,7 +29,7 @@ import { T } from './libs/types/common';
     }
   }),
   ComponentsModule,  // HHTP qolgan moduleni birlashtradi (koprik) 
-  DatabaseModule // TCP loyihamizning asosiy mantigi uchun hizmat qiladigon module imports orqali integratsiyasini qabul qilib olamiz
+  DatabaseModule, SocketModule // TCP loyihamizning asosiy mantigi uchun hizmat qiladigon module imports orqali integratsiyasini qabul qilib olamiz
 ], 
 	controllers: [AppController], //rest api 
 	providers: [AppService, AppResolver],// graphql api ikkisi bolmasa ham bolaverad test uchun tepasidagi ham

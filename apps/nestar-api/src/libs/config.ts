@@ -67,7 +67,7 @@ export const lookupAuthMemberLiked = (memberId: T, targetRefId: string = '$_id')
 
 
 
-interface lookupAuthMemberFollowed {
+interface lookupAuthMemberFollowed { //look up  FARQI Bu yerda @ ta Malumot oaldi
 	followerId: T;
 	followingId: string;
 }
@@ -81,10 +81,10 @@ export const lookupAuthMemberFollowed = (input: lookupAuthMemberFollowed) => {
 			from: 'follows', //likees collectionda izledi
 			let: {
 				//likes ni ichiga kirib shuni ichidan qidirishini aytyappiz (search)
-				localFollowerId: followerId, //"$_id" bu shunde degani
+				localFollowerId: followerId, //" property ni 
 				localFollowingId: followingId,
-				localMyFavorite: true,
-			},
+				localMyFavorite: true,  //For Testing 
+			},//^^ mantiq Databaseda ishga tushib malumotni olib kelib berayabdi 
 			//pipeline
 			pipeline: [
 				{
@@ -149,7 +149,7 @@ export const lookupFavorite  = {
 	},
 }
 
-	export const lookupVisit​​  = {
+	export const lookupVisit  = {
 	$lookup: {
 		from: 'members',
 		localField: 'visitedProperty.memberId',
