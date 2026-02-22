@@ -11,56 +11,108 @@ import { lookupVisit } from '../../libs/config';
 
 @Injectable()
 export class ViewService {
-	constructor(@InjectModel('View') private readonly viewModel: Model<View>) {}
+	constructor(@InjectModel('Views') private readonly viewModel: Model<View>) {}
 
-	public async recordView(input: ViewInput): Promise<View | null> {
-		const viewExist = await this.checkViewExistance(input);
-		if (!viewExist) {
-			console.log('- New View Insert =');
-			return await this.viewModel.create(input);
-		} else return null;
-	}
+public async recordView(input: ViewInput): Promise<View | null> {
+  const viewExist = await this.checkViewExistence(input);
+  if (!viewExist) {
+   console.log(' New View Insert');
 
-	private async checkViewExistance(input: ViewInput): Promise<View> {
-		const { memberId, viewRefId } = input;
-		const search: T = { memberId: memberId, viewRefId: viewRefId };
-		return await this.viewModel.findOne(search).exec();
-	}
+   return await this.viewModel.create(input);
+  } else return null;
+ }
 
+ private async checkViewExistence(input: ViewInput): Promise<View> {
+  const { memberId, viewRefId } = input;
+  return await this.viewModel.findOne({ memberId: memberId, viewRefId: viewRefId }).exec();
+ }
+ public async getVisitedProperties(memberId: ObjectId, input: OrdinaryInquiry): Promise<Properties> {
+  const { page, limit } = input;
 
-		public async getVisitedProperties(memberId: ObjectId, input: OrdinaryInquiry): Promise<Properties> {
-			const { page, limit } = input;
-			const match: T = { viewGroup: ViewGroup.PROPERTY, memberId: memberId }; //likes collectionida like bosgan propertylarimizi izlayapmiz
+  const match = {
+   viewGroup: ViewGroup.PROPERTY,
+   memberId: memberId,
+  }; //likes collectionida like bosgan propertylarimizi izlayapmiz
+
+  const data: T = await this.viewModel
+   .aggregate([
+    { $match: match },
+    { $sort: { updatedAt: -1 } }, //eng ohirgi qoygan likedan olib beradi
+    {
+     $lookup: {
+      from: 'properties',
+      localField: 'viewRefId',
+      foreignField: '_id',
+      as: 'visitedProperty',
+     },
+    },
+    {
+     $unwind: {
+      path: '$visitedProperty',
+      preserveNullAndEmptyArrays: true,
+     },
+    }, //oddiy aray ichidan tashqariga chiqarib  berishini talab etayabmiz
+    {
+     $facet: {
+      list: [
+       { $skip: (page - 1) * limit },
+       { $limit: limit },
+       lookupVisit,
+       {
+        $unwind: {
+         path: '$visitedProperty.memberData',
+         preserveNullAndEmptyArrays: true,
+        },
+       },
+      ],
+      metaCounter: [{ $count: 'total' }],
+     },
+    },
+   ])
+   .exec();
+
+     console.log("Data:", data);
+
+  const result: Properties = { list: [], metaCounter: data[0].metaCounter };
+  result.list = data[0].list.map((ele) => ele.visitedProperty);
+  console.log("Visited Properties h:", result);
+  return result;
+ }
+
+		// public async getVisitedProperties(memberId: ObjectId, input: OrdinaryInquiry): Promise<Properties> {
+
+		// 	const { page, limit } = input;
+		// 	const match: T = { viewGroup: ViewGroup.PROPERTY, memberId: memberId }; //likes collectionida like bosgan propertylarimizi izlayapmiz
 	
-			const data: T = await this.viewModel
-			.aggregate([
-				{ $match: match },
-				{ $sort: { updatedAt: -1 } }, //eng ohirgi qoygan likedan olib beradi
-				{
-					$lookup: {
-						from: 'properties',
-						localField: 'viewRefId',
-						foreignField: '_id',
-						as: 'visitedProperty',
-					},
-				},
-				{ $unwind: '$visited.Property' },//oddiy aray ichidan tashqariga chiqarib  berishini talab etayabmiz
-				{
-					$facet: {
-						list: [
-							{ $skip: (page - 1) * limit },
-							{ $limit: limit },
-					lookupVisit,
-							{ $unwind: '$visitedProperty.memberData' },
-						],
-						metaCounter: [{ $count: 'total' }],
-					},
-				},
-			]).exec();
+		// 	const data: T = await this.viewModel
+		// 	.aggregate([
+		// 		{ $match: match },
+		// 		{ $sort: { updatedAt: -1 } }, //eng ohirgi qoygan likedan olib beradi
+		// 		{
+		// 			$lookup: {
+		// 				from: 'properties',
+		// 				localField: 'viewRefId',
+		// 				foreignField: '_id',
+		// 				as: 'visitedProperty',
+		// 			},
+		// 		},
+		// 		{ $unwind: '$visited.Property' },//oddiy aray ichidan tashqariga chiqarib  berishini talab etayabmiz
+		// 		{
+		// 			$facet: {
+		// 				list: [
+		// 					{ $skip: (page - 1) * limit },
+		// 					{ $limit: limit },
+		// 			lookupVisit,
+		// 					{ $unwind: '$visitedProperty.memberData' },
+		// 				],
+		// 				metaCounter: [{ $count: 'total' }],
+		// 			},
+		// 		},
+		// 	]).exec();
 
-			const result: Properties = { list: [], metaCounter: data[0].metaCounter };
-			result.list = data[0].list.map((ele) => ele.visitedProperty);
+		// 	const result: Properties = { list: [], metaCounter: data[0].metaCounter };
+		// 	result.list = data[0].list.map((ele) => ele.visitedProperty);
 			
-			return result;
-		}  
+		// 	return result;
+		// }  
 }

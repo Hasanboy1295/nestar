@@ -30,6 +30,7 @@ export class PropertyResolver {
 		input.memberId = memberId; // ACCES TOOKEN ORQALI boytayabmiz memberID  ni frontenddan yubormayabmiz xafsizlik uchun  AGGREGENTGA BOGLIK ISHLAR qilmaslik uchun
 		return await this.propertyService.createProperty(input); //tepadagi
 	}
+	
 	// INTERSEPTOR (Res)
 	@UseGuards(WithoutGuard)
 	@Query((returns) => Property)

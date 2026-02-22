@@ -7,7 +7,7 @@ import ViewSchema from '../../schemas/View.model';
 	imports: [
 		MongooseModule.forFeature([
 			{
-				name: 'View',
+				name: 'Views',
 				schema: ViewSchema,
 			},
 		]),

@@ -170,10 +170,10 @@ private shapeMatchQuery(match: T, input: PropertiesInquiry): void {
   } = input.search;
 
   if (memberId) match.memberId = shapeIntoMongoObjectId(memberId);
-  if (locationList) match.propertyLocation = { $in: locationList };//IN include  SEOUL YOKI BUSAN BOLSA BER YOKI BERMA
-  if (roomsList) match.propertyRooms = { $in: roomsList };// Arrayda keladi malumot 
-  if (bedsList) match.propertyBeds = { $in: bedsList };
-  if (typeList) match.propertyType = { $in: typeList };
+  if (locationList && locationList.length) match.propertyLocation = { $in: locationList };//IN include  SEOUL YOKI BUSAN BOLSA BER YOKI BERMA
+  if (roomsList && roomsList.length) match.propertyRooms = { $in: roomsList };// Arrayda keladi malumot 
+  if (bedsList && bedsList.length) match.propertyBeds = { $in: bedsList };
+  if (typeList && typeList.length) match.propertyType = { $in: typeList };
 
   if (pricesRange) match.propertyPrice = { $gte: pricesRange.start, $lte: pricesRange.end };
   if (periodsRange) match.createdAt = { $gte: periodsRange.start, $lte: periodsRange.end };
